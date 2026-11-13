@@ -131,5 +131,15 @@
   "mail.testSentSelf": "Test email sent to {{address}} through {{provider}}. Check your inbox.",
   "mail.testSentOther": "Test email sent to {{address}} through {{provider}}. Ask the recipient to check that inbox, including the spam folder.",
   "mail.deliverySettingsUnavailable": "Email delivery settings were not found. Apply migration 19.",
-  "mail.deliverySaveFailed": "Unable to update email delivery."
+  "mail.deliverySaveFailed": "Unable to update email delivery.",
+  "objective.unlockReasonInvalid": "Enter a valid reason for unlocking submitted objectives.",
+  "objective.unlockReasonLength": "Explain the change in 5 to 500 characters.",
+  "objective.profileFrozen": "The appraisal level cannot be changed after submission.",
+  "objective.unlockFirst": "Unlock the submitted objective plan before making changes.",
+  "objective.reratePending": "Objectives have changed. Re-rate them before updating the appraisal.",
+  "objective.lockBeforeUpdate": "Lock the objective plan before updating the appraisal.",
+  "objective.planEmpty": "The locked objective plan has no objectives.",
+  "objective.planMismatch": "Submitted objectives must match the locked objective plan.",
+  "objective.auditMissing": "The objective-change audit is missing. Recheck the locked plan before updating.",
+  "objective.planStale": "The objective plan changed while this form was open. Reload the appraisal before updating."
 }

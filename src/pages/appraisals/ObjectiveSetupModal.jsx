@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { parseLocalizedNumber, formatNumber } from '../../utils/format';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { canAdjustSubmittedObjectives, objectiveDenialKey, isObjectiveReratingPending, updatesRemaining } from '../../utils/postSubmissionObjectives';
 import {
   AlertCircle,
   Check,
@@ -9,6 +11,7 @@ import {
   ClipboardCopy,
   FileCheck2,
   FileText,
+  Info,
   LockKeyhole,
   Plus,
   Save,
@@ -65,11 +68,18 @@ const normalizeDefaults = (rows = []) => rows.map((row) => ({
   is_default_seed: true,
 }));
 
-const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, autoUnlock = false }) => {
-  const { t } = useTranslation('objectives');
+const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, onUpdateNow, autoUnlock = false }) => {
+  const { t } = useTranslation(['objectives', 'appraisals']);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const reduceMotion = useReducedMotion();
   const { showToast } = useToastStore();
   const { data, loading, saving, fetchObjectivePlan, saveObjectivePlan, unlockObjectivePlan, clearObjectivePlan } = useObjectivePlansStore();
   const [rows, setRows] = useState([]);
+  const [reasonOpen, setReasonOpen] = useState(false);
+  const [unlockReason, setUnlockReason] = useState('');
+  const reasonRef = useRef(null);
+  const reasonDialogRef = useRef(null);
   const [addObjectiveId, setAddObjectiveId] = useState('');
   const [scoringProfileId, setScoringProfileId] = useState('');
   const hydratedRef = useRef('');
@@ -107,6 +117,34 @@ const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, auto
   const canPrepare = Number(data?.permissions?.can_prepare) === 1;
   const canLock = Number(data?.permissions?.can_lock) === 1;
   const canUnlock = Number(data?.permissions?.can_unlock) === 1;
+  const submittedPermission = !hasAppraisal || canAdjustSubmittedObjectives(data);
+  const canEditPlan = canPrepare && submittedPermission;
+  const canLockPlan = canLock && submittedPermission;
+  const canUnlockPlan = canUnlock && submittedPermission;
+  const eligibilityReason = t(objectiveDenialKey(data?.reason_key), { ns: 'appraisals' });
+  const remainingUpdates = updatesRemaining(data);
+  const pendingRerating = isObjectiveReratingPending(data);
+
+  useEffect(() => {
+    if (!reasonOpen) return undefined;
+    reasonRef.current?.focus();
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape' && !saving) {
+        event.preventDefault();
+        setReasonOpen(false);
+        setUnlockReason('');
+      } else if (event.key === 'Tab') {
+        const focusable = Array.from(reasonDialogRef.current?.querySelectorAll('button:not([disabled]), textarea:not([disabled])') || []);
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [reasonOpen, saving]);
   useEffect(() => {
     let active = true;
     if (!data || locked || hasAppraisal || !canPrepare) {
@@ -120,7 +158,7 @@ const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, auto
   }, [data, locked, hasAppraisal, canPrepare]);
 
   const requestKpiSuggestions = async (row) => {
-    if (!kpiAiAvailable || locked || hasAppraisal || !canPrepare || clean(row.question_text).length < 12) return;
+    if (!kpiAiAvailable || locked || hasAppraisal || !canEditPlan || clean(row.question_text).length < 12) return;
     const epoch = ++suggestionRequestRef.current;
     setKpiAi({ rowId: row.local_id, loading: true, suggestion: '', error: '', copied: false });
     try {
@@ -302,13 +340,15 @@ const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, auto
       setRows(normalizeSelected(result.data?.selected || []));
       setScoringProfileId(result.data?.scoring_profile?.id ? String(result.data.scoring_profile.id) : '');
       onChanged?.(result.data);
-      // Both Save Draft and Lock Objectives close on successful completion.
-      onClose?.();
+      // A changed submitted plan stays open so the supervisor can re-rate now.
+      if (!(lock && Number(result.data?.has_appraisal) === 1 && isObjectiveReratingPending(result.data))) {
+        onClose?.();
+      }
     }
   };
 
-  const unlock = async () => {
-    const result = await unlockObjectivePlan({ staffUserId: staff.staff_user_id, sectionId });
+  const unlock = async (reason = null) => {
+    const result = await unlockObjectivePlan({ staffUserId: staff.staff_user_id, sectionId, reason });
     if (result.success) {
       hydratedRef.current = '';
       suggestionRequestRef.current += 1;
@@ -316,7 +356,25 @@ const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, auto
       setRows(normalizeSelected(result.data?.selected || []));
       setScoringProfileId(result.data?.scoring_profile?.id ? String(result.data.scoring_profile.id) : '');
       onChanged?.(result.data);
+      setReasonOpen(false);
+      setUnlockReason('');
     }
+  };
+
+  const requestUnlock = () => {
+    if (!canUnlockPlan) return;
+    if (hasAppraisal) { setReasonOpen(true); return; }
+    unlock();
+  };
+
+  const updateAppraisalNow = () => {
+    const appraisalId = Number(data?.appraisal_id);
+    if (!appraisalId) return;
+    onClose?.();
+    if (onUpdateNow) { onUpdateNow(); return; }
+    const from = ['/my-team-appraisals', '/appraisals'].includes(location.pathname)
+      ? location.pathname : ['/my-team-appraisals', '/appraisals'].includes(location.state?.from) ? location.state.from : '/appraisals';
+    navigate(`/appraisals/edit/${appraisalId}`, { state: { from } });
   };
 
   useEffect(() => {
@@ -330,14 +388,14 @@ const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, auto
   return (
     <motion.div
       className="apr-objective-modal-backdrop"
-      initial={{ opacity: 0 }}
+      initial={reduceMotion ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      exit={reduceMotion ? undefined : { opacity: 0 }}
       onMouseDown={(event) => {
         if (event.target === event.currentTarget && !saving) onClose?.();
       }}
     >
-      <motion.div className="apr-objective-modal apr-objective-modal--setup" initial={{ opacity: 0, y: 18, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 18, scale: 0.97 }}>
+      <motion.div className="apr-objective-modal apr-objective-modal--setup" role="dialog" aria-modal="true" aria-label={t('setup.overviewAria')} initial={reduceMotion ? false : { opacity: 0, y: 18, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={reduceMotion ? undefined : { opacity: 0, y: 18, scale: 0.97 }}>
         <div className="apr-objective-modal__head">
           <div>
             <span className="apr-eyebrow">{t('setup.eyebrow')}</span>
@@ -354,6 +412,17 @@ const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, auto
           <div className="apr-empty apr-empty--compact"><AppIcon icon={AlertCircle} /><h3>{t('setup.loadingError')}</h3></div>
         ) : (
           <>
+            {hasAppraisal && (
+              <div className="apr-objective-flow-notice" role="status">
+                <AppIcon icon={Info} />
+                <div>
+                  <strong>{t('setup.submittedTitle')}</strong>
+                  <p>{t('setup.submittedNotice', { count: remainingUpdates ?? 0 })}</p>
+                  {pendingRerating && <p>{t('setup.reratingPending')}</p>}
+                  {!submittedPermission && <p className="apr-objective-flow-denied">{eligibilityReason}</p>}
+                </div>
+              </div>
+            )}
             <section className="apr-objective-setup-overview" aria-label={t('setup.overviewAria')}>
               <div className="apr-objective-section-heading">
                 <div><span className="apr-objective-kicker">{t('setup.overviewKicker')}</span><h4>{t('setup.overviewTitle')}</h4><p>{t('setup.overviewDetail')}</p></div>
@@ -405,7 +474,7 @@ const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, auto
               </div>
             )}
 
-            {!locked && canPrepare && (
+            {!locked && canEditPlan && (
               <section className="apr-objective-setup-panel apr-objective-setup-panel--library">
                 <div className="apr-objective-section-heading apr-objective-section-heading--small">
                   <div><span className="apr-objective-kicker">{t('setup.buildKicker')}</span><h4>{t('setup.buildTitle')}</h4><p>{t('setup.buildDetail')}</p></div>
@@ -440,13 +509,13 @@ const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, auto
                   <div className="apr-objective-row__number">{index + 1}</div>
                   <div className="apr-objective-row__body">
                     <div className="apr-objective-row__title">
-                      {row.is_new && !locked && canPrepare ? (
+                      {row.is_new && !locked && canEditPlan ? (
                         <textarea value={row.question_text} onChange={(event) => updateRow(row.local_id, 'question_text', event.target.value)} rows="2" placeholder={t('setup.individualPlaceholder')} />
                       ) : <strong>{row.objective_code ? `${row.objective_code} — ` : ''}{row.question_text}</strong>}
                       <div className="apr-objective-row__actions">
                         <span className={`apr-objective-scope apr-objective-scope--${row.scope}`}>{t(row.scope === 'department' ? 'setup.departmentKpi' : 'setup.individualObjective')}</span>
                         {row.review_status === 'needs_review' && <span className="apr-objective-review">{t('setup.needsReview')}</span>}
-                        {!locked && canPrepare && (
+                        {!locked && canEditPlan && (
                           <button type="button" className="apr-objective-remove" onClick={() => removeRow(row.local_id)} title={t('setup.removeTitle')} aria-label={t('setup.removeObjectiveNumber', { number: index + 1 })}>
                             <AppIcon icon={Trash2} />
                           </button>
@@ -457,24 +526,24 @@ const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, auto
                     <div className="apr-objective-fields">
                       <label className="apr-objective-field apr-objective-field--target">
                         <span>{t('setup.targetLabel')} {Number(config.require_target) === 1 ? '*' : ''}</span>
-                        <textarea disabled={locked || !canPrepare} value={row.target} onChange={(event) => updateRow(row.local_id, 'target', event.target.value)} rows="2" placeholder={t('setup.targetPlaceholder')} />
+                        <textarea disabled={locked || !canEditPlan} value={row.target} onChange={(event) => updateRow(row.local_id, 'target', event.target.value)} rows="2" placeholder={t('setup.targetPlaceholder')} />
                       </label>
                       <label className="apr-objective-field apr-objective-field--evidence">
                         <span>{t('setup.evidenceLabel')} {Number(config.require_evidence) === 1 ? '*' : ''}</span>
-                        <input disabled={locked || !canPrepare} value={row.evidence_source} onChange={(event) => updateRow(row.local_id, 'evidence_source', event.target.value)} placeholder={t('setup.evidencePlaceholder')} />
+                        <input disabled={locked || !canEditPlan} value={row.evidence_source} onChange={(event) => updateRow(row.local_id, 'evidence_source', event.target.value)} placeholder={t('setup.evidencePlaceholder')} />
                       </label>
                       {Number(config.require_weights) === 1 && (
                         <label className="apr-objective-field apr-objective-weight">
                           <span>{t('setup.weightLabel')}</span>
                           <span className="apr-objective-weight__control">
-                            <input disabled={locked || !canPrepare} type="text" inputMode="decimal" value={row.weight_percent} onChange={(event) => updateRow(row.local_id, 'weight_percent', event.target.value)} placeholder="0" />
+                            <input disabled={locked || !canEditPlan} type="text" inputMode="decimal" value={row.weight_percent} onChange={(event) => updateRow(row.local_id, 'weight_percent', event.target.value)} placeholder="0" />
                             <span className="apr-objective-weight__suffix">%</span>
                           </span>
                         </label>
                       )}
                     </div>
 
-                    {kpiAiAvailable && !locked && !hasAppraisal && canPrepare && (
+                    {kpiAiAvailable && !locked && !hasAppraisal && canEditPlan && (
                       <div className="apr-objective-kpi-ai">
                         <button
                           type="button"
@@ -509,7 +578,7 @@ const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, auto
                   </div>
                 </div>
               ))}
-              {!locked && canPrepare && Number(config.allow_individual_objectives) === 1 && rows.length > 0 && (
+              {!locked && canEditPlan && Number(config.allow_individual_objectives) === 1 && rows.length > 0 && (
                 <div className="apr-objective-add-more">
                   <button type="button" className="apr-btn apr-objective-add-btn" onClick={addIndividualObjective}>
                     <AppIcon icon={Plus} /> {t('setup.addIndividual')}
@@ -536,7 +605,7 @@ const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, auto
                   </span>
                 </div>
                 <div className="apr-objective-weight-progress" aria-hidden="true"><span style={{ width: `${Math.min(100, requiredWeight > 0 ? (weightTotal / requiredWeight) * 100 : 0)}%` }} /></div>
-                {!locked && canPrepare && <button type="button" className="apr-mini-btn apr-objective-distribute-btn" onClick={distributeEqually} title={t('setup.distributeTitle')}><AppIcon icon={Scale} /> {t('setup.distribute')}</button>}
+                {!locked && canEditPlan && <button type="button" className="apr-mini-btn apr-objective-distribute-btn" onClick={distributeEqually} title={t('setup.distributeTitle')}><AppIcon icon={Scale} /> {t('setup.distribute')}</button>}
               </div>
             )}
 
@@ -547,15 +616,45 @@ const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, auto
         <div className="apr-objective-modal__actions">
           <button type="button" className="apr-btn apr-btn--ghost" onClick={onClose} disabled={saving}>{t('setup.close')}</button>
           {!loading && data && (locked ? (
-            !hasAppraisal && canUnlock ? <button type="button" className="apr-btn apr-btn--ghost" disabled={saving} onClick={unlock}><AppIcon icon={UnlockKeyhole} /> {t('setup.unlock')}</button> : null
+            <>
+              {canUnlock && <button type="button" className="apr-btn apr-btn--ghost" disabled={saving || !canUnlockPlan} title={canUnlockPlan ? t('setup.unlock') : eligibilityReason} onClick={requestUnlock}><AppIcon icon={UnlockKeyhole} /> {t('setup.unlock')}</button>}
+              {hasAppraisal && pendingRerating && canAdjustSubmittedObjectives(data) && (
+                <button type="button" className="apr-btn apr-btn--primary" onClick={updateAppraisalNow}><AppIcon icon={FileCheck2} /> {t('setup.updateAppraisalNow')}</button>
+              )}
+            </>
           ) : (
             <>
-              {canPrepare && <button type="button" className="apr-btn apr-btn--ghost" disabled={saving} onClick={() => submit(false)}><AppIcon icon={Save} /> {t('setup.saveDraft')}</button>}
-              {canLock && <button type="button" className="apr-btn apr-btn--primary" disabled={saving} onClick={() => submit(true)}><AppIcon icon={LockKeyhole} /> {t('setup.lock')}</button>}
+              {canEditPlan && <button type="button" className="apr-btn apr-btn--ghost" disabled={saving} onClick={() => submit(false)}><AppIcon icon={Save} /> {t('setup.saveDraft')}</button>}
+              {canLockPlan && <button type="button" className="apr-btn apr-btn--primary" disabled={saving} onClick={() => submit(true)}><AppIcon icon={LockKeyhole} /> {t('setup.lock')}</button>}
             </>
           ))}
         </div>
       </motion.div>
+      {reasonOpen && (
+        <div className="apr-objective-reason-backdrop">
+          <div className="apr-objective-reason-dialog" role="dialog" aria-modal="true" aria-labelledby="apr-objective-reason-title" ref={reasonDialogRef}>
+            <h3 id="apr-objective-reason-title">{t('setup.unlockReasonTitle')}</h3>
+            <p>{t('setup.unlockReasonDetail')}</p>
+            <label htmlFor="apr-objective-unlock-reason">{t('setup.unlockReasonLabel')}</label>
+            <textarea
+              id="apr-objective-unlock-reason"
+              ref={reasonRef}
+              rows={4}
+              maxLength={500}
+              value={unlockReason}
+              onChange={(event) => setUnlockReason(event.target.value)}
+              aria-describedby="apr-objective-reason-hint"
+            />
+            <small id="apr-objective-reason-hint">{t('setup.unlockReasonHint')}</small>
+            <div className="apr-objective-reason-actions">
+              <button type="button" className="apr-btn apr-btn--ghost" disabled={saving} onClick={() => { setReasonOpen(false); setUnlockReason(''); }}>{t('setup.cancel')}</button>
+              <button type="button" className="apr-btn apr-btn--primary" disabled={saving || Array.from(unlockReason.trim()).length < 5 || Array.from(unlockReason.trim()).length > 500} onClick={() => unlock(unlockReason.trim())}>
+                <AppIcon icon={UnlockKeyhole} /> {t('setup.confirmUnlock')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };

@@ -6,7 +6,7 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import PageNav from '../../components/PageNav';
 import AppIcon from '../../components/ui/AppIcon';
-import { CircleCheck, FileDown, History, Info, MessageSquare, MessageSquareReply, PenLine, RefreshCw, ShieldCheck, TriangleAlert, UserCheck } from 'lucide-react';
+import { CircleCheck, FileDown, History, Info, MessageSquare, MessageSquareReply, PenLine, RefreshCw, ShieldCheck, Target, TriangleAlert, UserCheck } from 'lucide-react';
 import useAuthStore from '../../stores/useAuthStore';
 import useCompanyWritePermission from '../../hooks/useCompanyWritePermission';
 import useAppraisalsStore from '../../stores/useAppraisalsStore';
@@ -21,6 +21,8 @@ import RestoreAppraisalUpdatesModal from './RestoreAppraisalUpdatesModal';
 import VerifyBreachModal from './VerifyBreachModal';
 import ManagementFollowUpResponseModal from './ManagementFollowUpResponseModal';
 import './Appraisals.css';
+import ObjectiveSetupModal from './ObjectiveSetupModal';
+import { canAdjustSubmittedObjectives, isObjectiveReratingPending, objectiveDenialKey } from '../../utils/postSubmissionObjectives';
 import ExplainAppraisalCard from '../../components/ai/ExplainAppraisalCard';
 
 const safeNumber = (value, fallback = 0) => {
@@ -140,6 +142,7 @@ const AppraisalView = () => {
   const [followUpResponseOpen, setFollowUpResponseOpen] = useState(false);
   const [restoreUpdatesOpen, setRestoreUpdatesOpen] = useState(false);
   const [verifyBreachOpen, setVerifyBreachOpen] = useState(false);
+  const [objectiveEditorSectionId, setObjectiveEditorSectionId] = useState(null);
 
   const isOwnAppraisal = Number(current?.staff_user_id || 0) === Number(user?.id || 0);
   const canVerifyBreach = !isViewOnly && ['admin', 'super_admin'].includes(user?.role)
@@ -150,6 +153,10 @@ const AppraisalView = () => {
   const isConductingSupervisor = ['admin', 'supervisor'].includes(user?.role)
     && Number(current?.supervisor_id || 0) === Number(user?.id || 0);
   const canEdit = Number(current?.can_manage_appraisal) === 1;
+  const canUpdate = Number(current?.can_update_appraisal) === 1;
+  const canAdjustObjectives = canAdjustSubmittedObjectives(current);
+  const objectiveDenial = t(objectiveDenialKey(current?.reason_key));
+  const objectiveSections = (current?.sections || []).filter((section) => section.section_type === 'kpi' && Number(section.section_id) > 0);
   const canSeeWeighted = ['super_admin', 'admin'].includes(user?.role);
   const canSeeStaffFeedback = canRespond || canEdit || ['super_admin', 'admin'].includes(user?.role);
   const managementReviewEnabled = Number(current?.management_review_enabled || 0) === 1;
@@ -195,6 +202,9 @@ const AppraisalView = () => {
       ) : current ? (
         <>
           <ScoreHero appraisal={current} />
+          {isObjectiveReratingPending(current) && (
+            <div className="apr-objective-flow-notice" role="status"><AppIcon icon={Info} /><span>{t('objectiveFlow.pendingBanner')}</span></div>
+          )}
 
           <div className="apr-summary-grid apr-summary-grid--view">
             <div className="apr-summary-card"><span>{t('view.score')}</span><strong>{formatScore(safeNumber(current.appraisal_summary))}</strong></div>
@@ -403,6 +413,27 @@ const AppraisalView = () => {
                         <small>{revision.created_by_name || revision.created_by_email || t('view.system')} • {formatDateTime(revision.created_at)}</small>
                         <span>{revision.evaluation_statement || t('view.unrated')}</span>
                         <small>{revision.serious_breach_declared == null ? t('view.breach.notRecordedShort') : Number(revision.serious_breach_declared) === 1 ? t('view.breach.declaredRevision', { reason: revision.serious_breach_reason || '—', reference: revision.serious_breach_reference || '—' }) : t('view.breach.noBreach')}</small>
+                        {(revision.objective_changes || []).map((event) => (
+                          <details key={event.event_id} className="apr-objective-revision-detail">
+                            <summary>{t('objectiveFlow.revisionTitle')} · {formatDateTime(event.unlocked_at)}</summary>
+                            <p><strong>{t('objectiveFlow.unlockReason')}</strong> {event.unlock_reason}</p>
+                            <div className="apr-objective-revision-pair">
+                              {[['before', event.before], ['after', event.after]].map(([kind, items]) => (
+                                <div key={kind}>
+                                  <strong>{t(`objectiveFlow.${kind}`)}</strong>
+                                  {(items || []).map((item, idx) => (
+                                    <p key={`${item.kpi_question_id || item.question_id}-${idx}`}>
+                                      {item.question_text || '—'}
+                                      {item.objective_target && <small>{t('objectiveFlow.target')} {item.objective_target}</small>}
+                                      {item.question_weight != null && <small>{t('objectiveFlow.weight', { value: formatNumber(safeNumber(item.question_weight), { maximumFractionDigits: 2 }) })}</small>}
+                                      {item.rating != null && <small>{t('objectiveFlow.rating', { value: formatNumber(safeNumber(item.rating), { maximumFractionDigits: 2 }) })}</small>}
+                                    </p>
+                                  ))}
+                                </div>
+                              ))}
+                            </div>
+                          </details>
+                        ))}
                       </div>
                       <div className="apr-revision-row__score">
                         <strong>{revision.appraisal_summary !== null && revision.appraisal_summary !== undefined ? formatScore(safeNumber(revision.appraisal_summary)) : '—'}</strong>
@@ -521,11 +552,33 @@ const AppraisalView = () => {
                 <AppIcon icon={RefreshCw} /> {t('view.restoreUpdates')}
               </button>
             )}
-            {canEdit && attemptsLeft > 0 && <Link className="apr-btn apr-btn--primary" to={`/appraisals/edit/${id}`} state={{ from: returnTo }}><AppIcon icon={PenLine} /> {t('view.editAppraisal')}</Link>}
+            {isConductingSupervisor && objectiveSections.map((section) => (
+              <span key={section.section_id} className="apr-objective-adjust-wrapper" title={!canAdjustObjectives ? objectiveDenial : undefined} tabIndex={!canAdjustObjectives ? 0 : undefined} aria-label={!canAdjustObjectives ? t('objectiveFlow.adjustUnavailable', { name: current.staff_fullname, reason: objectiveDenial }) : undefined}>
+                <button
+                  type="button"
+                  className="apr-btn apr-btn--secondary"
+                  disabled={!canAdjustObjectives}
+                  title={canAdjustObjectives ? t('objectiveFlow.adjust') : undefined}
+                  aria-label={t('objectiveFlow.adjustFor', { name: current.staff_fullname })}
+                  onClick={() => setObjectiveEditorSectionId(Number(section.section_id))}
+                ><AppIcon icon={Target} /> {t('objectiveFlow.adjust')}{objectiveSections.length > 1 ? ` · ${section.section_label || section.section_code}` : ''}</button>
+              </span>
+            ))}
+            {canEdit && canUpdate && <Link className="apr-btn apr-btn--primary" to={`/appraisals/edit/${id}`} state={{ from: returnTo }}><AppIcon icon={PenLine} /> {t('view.editAppraisal')}</Link>}
           </div>
         </>
       ) : (
         <div className="apr-empty"><span><AppIcon icon={Info} /></span><h3>{t('view.notFound')}</h3><p>{t('view.notFoundDetail')}</p></div>
+      )}
+
+      {objectiveEditorSectionId && current && (
+        <ObjectiveSetupModal
+          staff={{ staff_user_id: Number(current.staff_user_id), staff_fullname: current.staff_fullname }}
+          sectionId={objectiveEditorSectionId}
+          cycle={{ id: current.cycle_id, title: current.cycle_title, year: current.cycle_year }}
+          onClose={() => setObjectiveEditorSectionId(null)}
+          onChanged={() => fetchSingleAppraisal(id)}
+        />
       )}
 
       {verifyBreachOpen && current && (

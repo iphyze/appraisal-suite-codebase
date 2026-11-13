@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import PageNav from '../../components/PageNav';
 import AppIcon from '../../components/ui/AppIcon';
-import { AlertCircle, ArrowRight, Layers, ListChecks, Percent, Plus, RefreshCw, Scale, Trash2, Undo2, UnlockKeyhole } from 'lucide-react';
+import { AlertCircle, ArrowRight, Info, Layers, ListChecks, Percent, Plus, RefreshCw, Scale, Trash2, Undo2, UnlockKeyhole } from 'lucide-react';
 import RatingField from './RatingField';
 import ObjectiveSetupModal from './ObjectiveSetupModal';
 import AppraisalHelpTip from './AppraisalHelpTip';
@@ -23,6 +23,7 @@ import AppraisalShell from './AppraisalShell';
 import { dash } from './helpers';
 import { clearAppraisalDraft, mergeAppraisalProgress, readAppraisalDraft, writeAppraisalDraft } from '../../utils/appraisalDraft';
 import './Appraisals.css';
+import { objectiveChangeCounts, objectiveDenialKey, isObjectiveReratingPending, updatesRemaining } from '../../utils/postSubmissionObjectives';
 
 const makeLocalId = () => `custom-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
@@ -273,6 +274,7 @@ const AppraisalForm = ({ mode = 'create' }) => {
   // ---- Progress kept across refreshes, idle time and re-login (saved on this device) ----
   const initializedForRef = useRef('');
   const baselineRef = useRef('');
+  const planSignatureRef = useRef(null);
   const submittedRef = useRef(false);
   const progressRef = useRef(null);
   const [draftNotice, setDraftNotice] = useState(null);
@@ -349,16 +351,20 @@ const AppraisalForm = ({ mode = 'create' }) => {
   useEffect(() => {
     if (!formData || !dataMatches) return;
     let state = freshStateFrom(formData);
+    const currentPlanSignature = String(formData.objective_plan_signature || '');
+    const pendingNewPlan = isEdit && isObjectiveReratingPending(formData);
+    const reloadedWithChangedPlan = planSignatureRef.current !== null && planSignatureRef.current !== currentPlanSignature;
     if (initializedForRef.current === draftIdentity && progressRef.current) {
-      // The same appraisal was reloaded (e.g. objectives adjusted): keep what has been entered.
-      state = mergeAppraisalProgress(state, progressRef.current);
+      // Retain free text and matching question ratings, but never revive deleted
+      // objectives, custom KPI rows, old targets or old weights after a relock.
+      state = mergeAppraisalProgress(state, progressRef.current, { strictObjectivePlan: pendingNewPlan || reloadedWithChangedPlan });
     } else {
       baselineRef.current = JSON.stringify(progressSnapshot(state));
       const draft = readAppraisalDraft(user?.id, draftIdentity);
       // For an existing appraisal, only restore if nobody has changed it since the draft was saved.
       const baseUpdatedAt = String(formData.appraisal?.updated_at || '');
       if (draft && (!isEdit || String(draft.baseUpdatedAt || '') === baseUpdatedAt)) {
-        state = mergeAppraisalProgress(state, draft);
+        state = mergeAppraisalProgress(state, draft, { strictObjectivePlan: pendingNewPlan || String(draft.planSignature || '') !== currentPlanSignature });
         setDraftNotice({ savedAt: draft.savedAt });
         setSavedAt(draft.savedAt);
       } else if (draft) {
@@ -367,6 +373,7 @@ const AppraisalForm = ({ mode = 'create' }) => {
     }
     applyState(state);
     initializedForRef.current = draftIdentity;
+    planSignatureRef.current = currentPlanSignature;
 
     if (!optionalDisplayInitializedRef.current) {
       const questions = state.sections.flatMap((section) => section.questions || []);
@@ -385,7 +392,14 @@ const AppraisalForm = ({ mode = 'create' }) => {
   const cycle = formData?.cycle || {};
   const supervisor = formData?.supervisor || {};
   const updateCount = safeNumber(formData?.appraisal?.update_count);
-  const attemptsLeft = Math.max(2 + safeNumber(formData?.appraisal?.extra_update_allowance) - updateCount, 0);
+  const attemptsLeft = updatesRemaining(formData) ?? Math.max(2 + safeNumber(formData?.appraisal?.extra_update_allowance) - updateCount, 0);
+  const objectiveRerating = isEdit && isObjectiveReratingPending(formData);
+  const objectiveSummary = formData?.objective_change_summary || {};
+  const changeCounts = objectiveChangeCounts(objectiveSummary);
+  const addedObjectiveIds = new Set((objectiveSummary.added || []).map((item) => `${item.section_id ?? ''}:${Number(item.question_id)}`));
+  // The summary flattens section arrays without copying section_id onto each
+  // item; include the original per-section references for accurate highlighting.
+  (objectiveSummary.sections || []).forEach((section) => (section.added || []).forEach((item) => addedObjectiveIds.add(`${Number(section.section_id)}:${Number(item.question_id)}`)));
   const isConductingAppraiser = ['admin', 'supervisor'].includes(user?.role) && Number(formData?.appraisal?.supervisor_id || supervisor?.id || 0) === Number(user?.id || 0);
   const ratingConfig = formData?.rating_config || {};
   const ratingMin = Number.isFinite(Number(ratingConfig.rating_min)) ? Number(ratingConfig.rating_min) : 1;
@@ -407,7 +421,11 @@ const AppraisalForm = ({ mode = 'create' }) => {
       clearAppraisalDraft(user.id, draftIdentity);
       return;
     }
-    writeAppraisalDraft(user.id, draftIdentity, { ...progressRef.current, baseUpdatedAt: String(formData?.appraisal?.updated_at || '') });
+    writeAppraisalDraft(user.id, draftIdentity, {
+      ...progressRef.current,
+      baseUpdatedAt: String(formData?.appraisal?.updated_at || ''),
+      planSignature: String(formData?.objective_plan_signature || ''),
+    });
     setSavedAt(Date.now());
   };
   const saveProgressRef = useRef(saveProgressNow);
@@ -879,6 +897,7 @@ const AppraisalForm = ({ mode = 'create' }) => {
       salary_upgrade: recommendations.salary_upgrade,
       development: recommendations.development,
       notify_staff: isEdit ? recommendations.notify_staff : true,
+      ...(isEdit && objectiveRerating ? { objective_plan_signature: formData.objective_plan_signature } : {}),
     };
 
     const result = isEdit
@@ -950,6 +969,29 @@ const AppraisalForm = ({ mode = 'create' }) => {
           </div>
         )}
 
+        {isEdit && Number(formData?.can_update_appraisal) !== 1 && (
+          <div className="apr-objective-flow-notice" role="alert"><AppIcon icon={AlertCircle} /><span>{t(objectiveDenialKey(formData?.reason_key))}</span></div>
+        )}
+        {objectiveRerating && (
+          <section className="apr-objective-change-summary" role="status" aria-label={t('objectiveFlow.summaryTitle')}>
+            <div className="apr-objective-change-summary__head">
+              <AppIcon icon={Info} />
+              <div><strong>{t('objectiveFlow.summaryTitle')}</strong><p>{t('objectiveFlow.summaryDetail')}</p></div>
+            </div>
+            <div className="apr-objective-change-summary__counts">
+              <span>{t('objectiveFlow.addedCount', { count: changeCounts.added })}</span>
+              <span>{t('objectiveFlow.removedCount', { count: changeCounts.removed })}</span>
+              <span>{t('objectiveFlow.changedCount', { count: changeCounts.changed })}</span>
+            </div>
+            {(objectiveSummary.sections || []).map((group) => (
+              <div className="apr-objective-change-summary__group" key={group.section_id}>
+                {[...(group.added || []).map((item) => ({ item, kind: 'added' })), ...(group.removed || []).map((item) => ({ item, kind: 'removed' })), ...(group.changed || []).map((item) => ({ item, kind: 'changed' }))].map(({ item, kind }, index) => (
+                  <p key={`${kind}-${item.question_id}-${index}`}><b>{t(`objectiveFlow.${kind}`)}</b> {kind === 'changed' ? item.after?.question_text || item.before?.question_text : item.question_text}</p>
+                ))}
+              </div>
+            ))}
+          </section>
+        )}
         <section className="apr-hero apr-hero--form apr-form-hero-live">
           <div className="apr-form-hero__identity">
             <p className="apr-eyebrow">{isEdit ? t('form.updateReview') : t('form.newReview')}</p>
@@ -1061,7 +1103,7 @@ const AppraisalForm = ({ mode = 'create' }) => {
                   )}
                 </div>
                 <div className="apr-section-head-actions">
-                  {objectiveQuestionsLocked && !isEdit && isConductingAppraiser && (
+                  {objectiveQuestionsLocked && isConductingAppraiser && (!isEdit || Number(formData?.can_adjust_objectives) === 1) && (
                     <button type="button" className="apr-mini-btn apr-objective-inline-edit" onClick={() => setObjectiveEditorSectionId(Number(section.id))}>
                       <AppIcon icon={UnlockKeyhole} /> {t('form.adjustObjectives')}
                     </button>
@@ -1168,13 +1210,16 @@ const AppraisalForm = ({ mode = 'create' }) => {
                 <div className="apr-question-list">
                   {activeQuestions.map((question, index) => (
                     <div
-                      className={`apr-question-row ${isKpi ? 'apr-question-row--kpi-editable' : ''}`}
+                      className={`apr-question-row ${isKpi ? 'apr-question-row--kpi-editable' : ''} ${objectiveRerating && addedObjectiveIds.has(`${Number(section.id)}:${Number(question.question_id)}`) && !ratings?.[section.id]?.[question.local_id] ? 'apr-question-row--new-objective' : ''}`}
                       data-kpi-local-id={question.local_id}
                       key={`${section.id}-${question.local_id}`}
                     >
                       <div className="apr-question-text">
                         <span>{index + 1}</span>
                         <div className="apr-question-body">
+                          {objectiveRerating && addedObjectiveIds.has(`${Number(section.id)}:${Number(question.question_id)}`) && (
+                            <span className="apr-new-objective-label" role="status">{!ratings?.[section.id]?.[question.local_id] ? t('objectiveFlow.newNeedsRating') : t('objectiveFlow.newRated')}</span>
+                          )}
                           {isKpi && !objectiveQuestionsLocked ? (
                             <textarea
                               className={`apr-kpi-question-input ${submitted && !String(question.question_text || '').trim() ? 'apr-field--error' : ''}`}
@@ -1520,7 +1565,7 @@ const AppraisalForm = ({ mode = 'create' }) => {
                 {t('form.checkBeforeSubmitting')}
               </button>
             )}
-            <button type="submit" className="apr-btn apr-btn--primary" title={t('form.submitTip')} disabled={saving || totalRatingInputs === 0 || (isEdit && isConductingAppraiser && attemptsLeft <= 0)}>
+            <button type="submit" className="apr-btn apr-btn--primary" title={t('form.submitTip')} disabled={saving || totalRatingInputs === 0 || (isEdit && (attemptsLeft <= 0 || Number(formData?.can_update_appraisal) !== 1))}>
               {saving ? <><span className="apr-spinner" /> {t('form.saving')}</> : <>{isEdit ? t('form.updateAppraisal') : t('form.submitAppraisal')} <AppIcon icon={ArrowRight} /></>}
             </button>
           </div>
@@ -1559,6 +1604,10 @@ const AppraisalForm = ({ mode = 'create' }) => {
           onClose={() => setObjectiveEditorSectionId(null)}
           onChanged={async (nextData) => {
             if (nextData?.plan?.status === 'locked') await refreshCurrentForm();
+          }}
+          onUpdateNow={async () => {
+            setObjectiveEditorSectionId(null);
+            await refreshCurrentForm();
           }}
         />
       )}

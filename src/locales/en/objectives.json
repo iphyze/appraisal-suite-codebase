@@ -89,6 +89,17 @@
     "removeTitle": "Remove objective",
     "targetPlaceholder": "Define the measurable target",
     "evidencePlaceholder": "e.g. project records, ERP report",
-    "percent": "{{value}}%"
+    "percent": "{{value}}%",
+    "submittedTitle": "Appraisal already submitted",
+    "submittedNotice_one": "You can adjust and lock these objectives, then update the appraisal to re-rate them. Updates left: {{count}}.",
+    "submittedNotice_other": "You can adjust and lock these objectives, then update the appraisal to re-rate them. Updates left: {{count}}.",
+    "reratingPending": "The locked objectives have changed. Update the appraisal to re-rate them.",
+    "updateAppraisalNow": "Update appraisal now",
+    "unlockReasonTitle": "Why are you changing these objectives?",
+    "unlockReasonDetail": "This reason is recorded in the audit trail and linked to the next appraisal revision.",
+    "unlockReasonLabel": "Reason for unlocking",
+    "unlockReasonHint": "Enter 5 to 500 characters.",
+    "cancel": "Cancel",
+    "confirmUnlock": "Unlock objectives"
   }
 }

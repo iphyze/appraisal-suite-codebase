@@ -131,5 +131,15 @@
   "mail.testSentSelf": "E-mail de test envoyé à {{address}} via {{provider}}. Consultez votre boîte de réception.",
   "mail.testSentOther": "E-mail de test envoyé à {{address}} via {{provider}}. Demandez au destinataire de consulter sa boîte de réception, y compris les indésirables.",
   "mail.deliverySettingsUnavailable": "Paramètres d’envoi des e-mails introuvables. Appliquez la migration 19.",
-  "mail.deliverySaveFailed": "Impossible de modifier la configuration des e-mails."
+  "mail.deliverySaveFailed": "Impossible de modifier la configuration des e-mails.",
+  "objective.unlockReasonInvalid": "Saisissez un motif valide pour déverrouiller les objectifs après soumission.",
+  "objective.unlockReasonLength": "Expliquez la modification en 5 à 500 caractères.",
+  "objective.profileFrozen": "Le niveau d’évaluation ne peut pas être modifié après soumission.",
+  "objective.unlockFirst": "Déverrouillez les objectifs soumis avant de les modifier.",
+  "objective.reratePending": "Les objectifs ont changé. Évaluez-les à nouveau avant de modifier l’évaluation.",
+  "objective.lockBeforeUpdate": "Verrouillez le plan d’objectifs avant de modifier l’évaluation.",
+  "objective.planEmpty": "Le plan d’objectifs verrouillé ne contient aucun objectif.",
+  "objective.planMismatch": "Les objectifs soumis doivent correspondre au plan d’objectifs verrouillé.",
+  "objective.auditMissing": "Le journal des modifications d’objectifs est introuvable. Vérifiez le plan verrouillé avant de mettre à jour l’évaluation.",
+  "objective.planStale": "Le plan d’objectifs a changé pendant que ce formulaire était ouvert. Rechargez l’évaluation avant de la mettre à jour."
 }

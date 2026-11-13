@@ -45,12 +45,13 @@ const useObjectivePlansStore = create((set) => ({
     }
   },
 
-  unlockObjectivePlan: async ({ staffUserId, sectionId }) => {
+  unlockObjectivePlan: async ({ staffUserId, sectionId, reason }) => {
     set({ saving: true, error: null });
     try {
       const response = await api.post('/objective-plans/unlock', {
         staff_user_id: Number(staffUserId),
         section_id: Number(sectionId),
+        ...(reason ? { reason } : {}),
       });
       const data = response.data?.data || null;
       set({ saving: false, data });

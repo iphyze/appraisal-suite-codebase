@@ -89,6 +89,17 @@
     "removeTitle": "Supprimer l’objectif",
     "targetPlaceholder": "Définissez la cible mesurable",
     "evidencePlaceholder": "Par exemple, dossiers de projet ou rapport ERP",
-    "percent": "{{value}} %"
+    "percent": "{{value}} %",
+    "submittedTitle": "Évaluation déjà soumise",
+    "submittedNotice_one": "Vous pouvez ajuster puis verrouiller les objectifs avant de mettre à jour l’évaluation. Modifications restantes : {{count}}.",
+    "submittedNotice_other": "Vous pouvez ajuster puis verrouiller les objectifs avant de mettre à jour l’évaluation. Modifications restantes : {{count}}.",
+    "reratingPending": "Les objectifs verrouillés ont changé. Mettez à jour l’évaluation pour les noter à nouveau.",
+    "updateAppraisalNow": "Mettre à jour l’évaluation maintenant",
+    "unlockReasonTitle": "Pourquoi modifier ces objectifs ?",
+    "unlockReasonDetail": "Ce motif est consigné dans le journal d’audit et rattaché à la prochaine révision de l’évaluation.",
+    "unlockReasonLabel": "Motif du déverrouillage",
+    "unlockReasonHint": "Saisissez entre 5 et 500 caractères.",
+    "cancel": "Annuler",
+    "confirmUnlock": "Déverrouiller les objectifs"
   }
 }

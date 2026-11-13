@@ -49,6 +49,7 @@ import AdminAppraisals from './components/AdminAppraisals';
 import SupervisorAppraisals from './components/SupervisorAppraisals';
 import StaffAppraisals from './components/StaffAppraisals';
 import ObjectiveSetupModal from './ObjectiveSetupModal';
+import { canAdjustSubmittedObjectives, objectiveDenialKey, isObjectiveReratingPending } from '../../utils/postSubmissionObjectives';
 import ScoringProfileModal from './ScoringProfileModal';
 import './Appraisals.css';
 
@@ -638,6 +639,12 @@ const Appraisals = ({ ownTeamOnly = false }) => {
                     const canManageAppraisal = canManageAdminRecords && Number(row.can_manage_appraisal) === 1;
                     const canManageObjectives = canManageAdminRecords && Number(row.can_manage_objectives) === 1;
                     const canManageProfile = canManageAdminRecords && Number(row.can_manage_profile) === 1;
+                    const isOwnConductingSupervisor = ['admin', 'supervisor'].includes(user?.role)
+                      && Number(row.appraisal_supervisor_id) === Number(user?.id);
+                    const hasSubmittedObjectivePlan = isAppraised && Number(row.objective_setup_required) === 1
+                      && Number(row.objective_section_id) > 0 && canManageAdminRecords && isOwnConductingSupervisor;
+                    const adjustAllowed = canAdjustSubmittedObjectives(row);
+                    const adjustReason = t(objectiveDenialKey(row.reason_key));
                     const profileRequired = Number(candidateMeta?.require_explicit_profile) === 1;
                     const profileMissing = profileRequired && !row.scoring_profile_id;
 
@@ -709,7 +716,22 @@ const Appraisals = ({ ownTeamOnly = false }) => {
                             {isAppraised ? (
                               <>
                                 <button type="button" onClick={() => navigate(`/appraisals/view/${appraisalId}`, { state: isOwnTeamView ? { from: "/my-team-appraisals" } : undefined })} title={t('list.view')}><AppIcon icon={Eye} /></button>
-                                {!isStaff && canManageAppraisal && <button type="button" onClick={() => navigate(`/appraisals/edit/${appraisalId}`, { state: isOwnTeamView ? { from: "/my-team-appraisals" } : undefined })} title={t('list.edit')}><AppIcon icon={PenLine} /></button>}
+                                {!isStaff && canManageAppraisal && Number(row.can_update_appraisal) === 1 && <button type="button" onClick={() => navigate(`/appraisals/edit/${appraisalId}`, { state: isOwnTeamView ? { from: "/my-team-appraisals" } : undefined })} title={t('list.edit')}><AppIcon icon={PenLine} /></button>}
+                                {hasSubmittedObjectivePlan && (
+                                  <span className="apr-objective-adjust-wrapper" title={!adjustAllowed ? adjustReason : undefined} tabIndex={!adjustAllowed ? 0 : undefined} aria-label={!adjustAllowed ? t('objectiveFlow.adjustUnavailable', { name: row.staff_fullname || fullName(row), reason: adjustReason }) : undefined}>
+                                    <button
+                                      type="button"
+                                      className="apr-objective-adjust-action"
+                                      disabled={!adjustAllowed}
+                                      title={adjustAllowed ? t('objectiveFlow.adjust') : undefined}
+                                      aria-label={t('objectiveFlow.adjustFor', { name: row.staff_fullname || fullName(row) })}
+                                      onClick={() => setObjectiveSetupStaff(row)}
+                                    >
+                                      <AppIcon icon={Target} /> {t('objectiveFlow.adjust')}
+                                    </button>
+                                  </span>
+                                )}
+                                {isObjectiveReratingPending(row) && <span className="apr-objective-pending-mark" title={t('objectiveFlow.pending')}><AppIcon icon={Info} /> {t('objectiveFlow.pendingShort')}</span>}
                               </>
                             ) : !isStaff ? (
                               Number(row.objective_setup_required) === 1 ? (

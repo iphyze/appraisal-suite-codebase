@@ -1202,5 +1202,43 @@
     "salaryRecommendation": "Recommandation d’augmentation salariale",
     "developmentRecommendation": "Recommandation de développement",
     "hrSignature": "Signature des ressources humaines / Date"
+  },
+  "objectiveFlow": {
+    "denial": {
+      "noUpdates": "Aucune modification restante. Demandez à un administrateur de rétablir votre quota.",
+      "notFound": "Cette évaluation est introuvable.",
+      "companyDenied": "Cette évaluation ne relève pas de votre société.",
+      "scopeDenied": "Ce collaborateur ne relève pas de votre périmètre autorisé.",
+      "supervisorOnly": "Seul le responsable ayant réalisé l’évaluation peut ajuster ces objectifs.",
+      "assignmentChanged": "Ce collaborateur ne vous est plus attribué pour ce cycle.",
+      "onboardingEdit": "Terminez l’intégration du responsable avant de modifier cette évaluation.",
+      "notAllowed": "L’ajustement des objectifs n’est pas disponible pour cette évaluation."
+    },
+    "adjust": "Ajuster les objectifs",
+    "adjustFor": "Ajuster les objectifs de {{name}}",
+    "adjustUnavailable": "Impossible d’ajuster les objectifs de {{name}}. {{reason}}",
+    "pending": "Objectifs à réévaluer",
+    "pendingShort": "Réévaluation requise",
+    "pendingBanner": "Les objectifs ont changé depuis la soumission de cette évaluation. Mettez à jour l’évaluation pour les noter à nouveau.",
+    "summaryTitle": "Objectifs modifiés depuis la soumission",
+    "summaryDetail": "Vérifiez les objectifs ajoutés, supprimés et modifiés. Les nouveaux objectifs doivent être notés avant la mise à jour.",
+    "addedCount_one": "{{count}} ajouté",
+    "addedCount_other": "{{count}} ajoutés",
+    "removedCount_one": "{{count}} supprimé",
+    "removedCount_other": "{{count}} supprimés",
+    "changedCount_one": "{{count}} modifié",
+    "changedCount_other": "{{count}} modifiés",
+    "added": "Ajouté :",
+    "removed": "Supprimé :",
+    "changed": "Cible, justificatif ou pondération modifiés :",
+    "newNeedsRating": "Nouvel objectif — note requise",
+    "newRated": "Nouvel objectif — noté",
+    "revisionTitle": "Historique des ajustements d’objectifs",
+    "unlockReason": "Motif du déverrouillage :",
+    "before": "Avant",
+    "after": "Après réévaluation",
+    "target": "Cible :",
+    "weight": "Pondération : {{value}} %",
+    "rating": "Note : {{value}}"
   }
 }

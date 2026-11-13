@@ -1202,5 +1202,43 @@
     "salaryRecommendation": "Salary Upgrade Recommendation",
     "developmentRecommendation": "Development Recommendation",
     "hrSignature": "Human Resources Department Signature / Date"
+  },
+  "objectiveFlow": {
+    "denial": {
+      "noUpdates": "No update attempts remain. Ask an administrator to restore your update allowance.",
+      "notFound": "This appraisal is unavailable.",
+      "companyDenied": "This appraisal is outside your company.",
+      "scopeDenied": "This employee is outside your staff scope.",
+      "supervisorOnly": "Only the conducting supervisor can adjust these objectives.",
+      "assignmentChanged": "This employee is no longer assigned to you for this cycle.",
+      "onboardingEdit": "Complete supervisor onboarding before changing this appraisal.",
+      "notAllowed": "Objective adjustment is not available for this appraisal."
+    },
+    "adjust": "Adjust objectives",
+    "adjustFor": "Adjust objectives for {{name}}",
+    "adjustUnavailable": "Cannot adjust objectives for {{name}}. {{reason}}",
+    "pending": "Objectives need re-rating",
+    "pendingShort": "Re-rate needed",
+    "pendingBanner": "Objectives changed since this appraisal was submitted. Update the appraisal to re-rate them.",
+    "summaryTitle": "Objectives changed since submission",
+    "summaryDetail": "Review added, removed and changed objectives. New objectives need ratings before you update this appraisal.",
+    "addedCount_one": "{{count}} added",
+    "addedCount_other": "{{count}} added",
+    "removedCount_one": "{{count}} removed",
+    "removedCount_other": "{{count}} removed",
+    "changedCount_one": "{{count}} changed",
+    "changedCount_other": "{{count}} changed",
+    "added": "Added:",
+    "removed": "Removed:",
+    "changed": "Target, evidence or weight changed:",
+    "newNeedsRating": "New objective — rating required",
+    "newRated": "New objective — rated",
+    "revisionTitle": "Objective adjustment history",
+    "unlockReason": "Unlock reason:",
+    "before": "Before",
+    "after": "After re-rating",
+    "target": "Target:",
+    "weight": "Weight: {{value}}%",
+    "rating": "Rating: {{value}}"
   }
 }

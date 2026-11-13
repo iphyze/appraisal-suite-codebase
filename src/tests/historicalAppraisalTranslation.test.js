@@ -19,7 +19,7 @@ test('editable KPI questions initialise from the original English source, not th
 test('language switching fetches translated snapshots without resetting draft identity or form progress', () => {
   assert.match(form, /\[identity, isEdit, fetchFormData, i18n\.resolvedLanguage\]/);
   assert.match(form, /initializedForRef\.current === draftIdentity && progressRef\.current/);
-  assert.match(form, /mergeAppraisalProgress\(state, progressRef\.current\)/);
+  assert.match(form, /mergeAppraisalProgress\(state, progressRef\.current, \{ strictObjectivePlan: pendingNewPlan \|\| reloadedWithChangedPlan \}\)/);
   assert.match(form, /question\.is_edited\s*\?\s*\{ question_text:/);
 });
 
