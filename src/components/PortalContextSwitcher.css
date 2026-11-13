@@ -1,0 +1,36 @@
+.portal-context {
+  margin: 14px 12px 2px;
+  padding: 12px;
+  border: 1px solid var(--nav-border);
+  border-radius: 17px;
+  background: var(--nav-bg-soft);
+  display: grid;
+  gap: 9px;
+
+  --usr-card: var(--nav-bg);
+  --usr-soft: var(--nav-bg-soft);
+  --usr-border: var(--nav-border);
+  --usr-text: var(--nav-text);
+  --usr-muted: var(--nav-muted);
+  --usr-input-bg: var(--nav-bg);
+  --usr-input-bd: var(--nav-border);
+  --usr-placeholder: var(--nav-muted);
+  --usr-shadow-lg: 0 18px 40px rgba(15, 23, 42, .2);
+}
+.portal-context__head { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.portal-context__head span { display:inline-flex; align-items:center; color:var(--nav-soft); font-size:10px; letter-spacing:.65px; font-family:var(--font-ui-medium); text-transform:uppercase; }
+.portal-context__head-icon { color:var(--nav-green); margin-right:5px; flex-shrink:0; vertical-align:-2px; }
+.portal-context__head button { border:0; background:transparent; color:var(--nav-green); font:inherit; font-size:10.5px; font-family:var(--font-ui-medium); cursor:pointer; }
+.portal-context .app-select__label { display:none; }
+.portal-context .app-select__trigger { min-height:42px; border-radius:12px; padding-left:10px; }
+.portal-context .app-select__value { font-size:12px; font-family:var(--font-ui-medium); }
+.portal-context .app-select__trigger-value { min-width:0; }
+.portal-context .app-select__dropdown { min-width:300px; left:0; }
+.portal-context .app-select__option-label { font-size:11.75px; font-family:var(--font-ui-regular); }
+.portal-context .app-select__option-desc { font-size:10.5px; }
+.portal-context .app-select__option { padding:8px 10px; margin-bottom:2px; }
+.ap-nav--dark .portal-context { --usr-shadow-lg: 0 18px 46px rgba(0,0,0,.38); }
+
+/* Batch 5i: French labels must remain readable in the company selector. */
+.portal-context .app-select__option-desc, .portal-context .app-select__option-label { white-space: normal; overflow-wrap: anywhere; line-height: 1.45; }
+.portal-context .app-select__dropdown { max-width: calc(100vw - 32px); }

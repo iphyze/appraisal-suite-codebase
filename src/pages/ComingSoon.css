@@ -1,0 +1,7 @@
+/* Keep longer French placeholder headings inside the existing card. */
+.ap-route-placeholder__card h2,
+.ap-route-placeholder__card p { overflow-wrap: break-word; }
+@media (max-width: 620px) {
+  .ap-route-placeholder { padding: 18px; }
+  .ap-route-placeholder__card { padding: 26px 18px; }
+}

@@ -1,0 +1,327 @@
+.ap-header {
+  --ap-green: #3da050;
+  --ap-green-dark: #2d8040;
+  --ap-green-dim: rgba(61, 160, 80, 0.14);
+  --ap-bg: rgba(255, 255, 255, 0.9);
+  --ap-surface: #ffffff;
+  --ap-surface-2: #f8faf9;
+  --ap-border: #e5e7eb;
+  --ap-text: #111827;
+  --ap-muted: #6b7280;
+  --ap-soft: #9ca3af;
+  height: 68px;
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 800;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 24px 0 calc(var(--app-sidebar-width, 260px) + 20px);
+  background: var(--ap-bg);
+  border-bottom: 0;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.07);
+  backdrop-filter: blur(16px);
+}
+
+.ap-header--dark {
+  --ap-bg: rgba(15, 23, 42, 0.88);
+  --ap-surface: #1e293b;
+  --ap-surface-2: #263348;
+  --ap-border: #334155;
+  --ap-text: #f1f5f9;
+  --ap-muted: #94a3b8;
+  --ap-soft: #64748b;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.24);
+}
+
+.ap-header__left,
+.ap-header__right,
+.ap-header__brand,
+.ap-header__user,
+.ap-header__search,
+.ap-header__dropdown-item,
+.ap-header__company-pill {
+  display: flex;
+  align-items: center;
+}
+
+.ap-header__left { gap: 14px; min-width: 0; }
+.ap-header__right { gap: 9px; flex-shrink: 0; }
+.ap-header__utilities { display: flex; align-items: center; gap: 6px; }
+.ap-header__center { flex: 1; display: flex; justify-content: flex-start; min-width: 0; }
+
+.ap-header__nav-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--ap-border);
+  border-radius: 12px;
+  background: var(--ap-surface);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.ap-header__nav-toggle span {
+  width: 18px;
+  height: 2px;
+  border-radius: 99px;
+  background: var(--ap-text);
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.ap-header__nav-toggle--open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.ap-header__nav-toggle--open span:nth-child(2) { opacity: 0; }
+.ap-header__nav-toggle--open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.ap-header__brand { gap: 10px; color: var(--ap-text); }
+.ap-header__brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(135deg, var(--ap-green), var(--ap-green-dark));
+  box-shadow: 0 12px 26px rgba(61, 160, 80, 0.26);
+}
+
+.ap-header__brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+.ap-header__brand-text strong { font-size: 14px; letter-spacing: -0.1px; font-family: var(--font-ui-bold); }
+.ap-header__brand-text small { font-size: 11px; color: var(--ap-muted); margin-top: 3px; }
+
+.ap-header__search {
+  width: min(480px, 100%);
+  height: 40px;
+  gap: 9px;
+  padding: 0 12px;
+  border: 1px solid var(--ap-border);
+  border-radius: 13px;
+  background: var(--ap-surface);
+  color: var(--ap-soft);
+}
+
+.ap-header__search input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ap-text);
+  font-family: inherit;
+  font-size: 12.5px;
+  min-width: 0;
+}
+
+.ap-header__search input::placeholder { color: var(--ap-soft); }
+.ap-header__search kbd {
+  border: 1px solid var(--ap-border);
+  border-radius: 7px;
+  color: var(--ap-muted);
+  font-size: 10px;
+  padding: 2px 6px;
+  background: var(--ap-surface-2);
+}
+
+.ap-header__utility-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--ap-border);
+  border-radius: 11px;
+  background: var(--ap-surface-2);
+  color: var(--ap-muted);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  position: relative;
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.ap-header__utility-btn:hover,
+.ap-header__utility-btn--active {
+  color: var(--ap-green);
+  border-color: rgba(61, 160, 80, 0.34);
+  background: var(--ap-green-dim);
+  box-shadow: 0 7px 18px rgba(31, 99, 51, 0.08);
+  transform: translateY(-1px);
+}
+
+.ap-header__theme { color: var(--ap-green); }
+.ap-header--dark .ap-header__theme { color: #7ddc91; }
+.ap-header__icon-btn { position: relative; }
+
+.ap-header__notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border: 2px solid var(--ap-surface);
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: #e5484d;
+  font-family: var(--font-ui-bold);
+  font-size: 8px;
+  line-height: 1;
+}
+
+.ap-header__user-wrap { position: relative; }
+.ap-header__user {
+  gap: 8px;
+  border: 1px solid var(--ap-border);
+  background: var(--ap-surface);
+  border-radius: 13px;
+  min-height: 40px;
+  padding: 5px 12px 5px 5px;
+  cursor: pointer;
+  color: var(--ap-text);
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.ap-header__user:hover,
+.ap-header__user--open {
+  border-color: rgba(61, 160, 80, 0.34);
+  background: var(--ap-surface-2);
+  box-shadow: 0 7px 18px rgba(31, 99, 51, 0.07);
+}
+
+.ap-header__avatar,
+.ap-header__dropdown-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(135deg, var(--ap-green), var(--ap-green-dark));
+  font-size: 11px;
+  font-family: var(--font-ui-bold);
+  flex-shrink: 0;
+}
+
+.ap-header__user-meta { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
+.ap-header__user-meta strong { font-size: 11.5px; font-family: var(--font-ui-medium); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ap-header__user-meta small { color: var(--ap-muted); font-size: 9.5px; text-transform: capitalize; }
+.ap-header__user-chevron { color: var(--ap-soft); font-size: 10px; transition: transform 0.18s; }
+.ap-header__user-chevron--open { transform: rotate(180deg); }
+
+.ap-header__dropdown {
+  position: absolute;
+  top: calc(100% + 16px);
+  right: 0;
+  width: 280px;
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-border);
+  border-radius: 18px;
+  padding: 10px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
+  z-index: 1200;
+}
+
+.ap-header--dark .ap-header__dropdown { box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
+
+.ap-header__dropdown-head { display: flex; gap: 10px; padding: 8px; align-items: center; }
+.ap-header__dropdown-head strong { display: block; color: var(--ap-text); font-size: 13px; font-family: var(--font-ui-medium); }
+.ap-header__dropdown-head small { display: block; color: var(--ap-muted); font-size: 11px; margin-top: 2px; word-break: break-word; font-family: var(--font-ui-regular); }
+
+.ap-header__company-pill {
+  gap: 8px;
+  padding: 9px 10px;
+  margin: 6px 0;
+  border-radius: 12px;
+  background: var(--ap-green-dim);
+  color: var(--ap-green);
+  font-size: 11.5px;
+  font-family: var(--font-ui-regular);
+}
+
+.ap-header__dropdown-item {
+  width: 100%;
+  gap: 10px;
+  border: 0;
+  background: transparent;
+  color: var(--ap-text);
+  border-radius: 12px;
+  padding: 11px 10px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  font-size: 12px;
+  font-family: var(--font-ui-regular);
+}
+
+.ap-header__dropdown-item:hover { background: var(--ap-surface-2); }
+.ap-header__dropdown-item--danger { color: #ef4444; }
+
+@media (max-width: 960px) {
+  .ap-header { padding-left: 18px; height: 64px; }
+  .ap-header__nav-toggle { display: flex; }
+  .ap-header__brand-text { display: none; }
+  .ap-header__center { justify-content: flex-start; }
+}
+
+@media (max-width: 720px) {
+  .ap-header { gap: 10px; padding-right: 14px; }
+  .ap-header__search { display: none; }
+  .ap-header__user-meta,
+  .ap-header__user-chevron { display: none; }
+  .ap-header__user { padding-right: 4px; }
+  .ap-header__dropdown { right: -4px; width: min(280px, calc(100vw - 24px)); }
+}
+
+
+@media (min-width: 901px) {
+  .ap-header__brand { display: none; }
+}
+
+
+.ap-header__notification-wrap { position: relative; }
+.ap-header__notifications {
+  position: absolute;
+  top: calc(100% + 16px);
+  right: 0;
+  width: min(380px, calc(100vw - 24px));
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-border);
+  border-radius: 18px;
+  padding: 10px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
+  z-index: 1200;
+}
+.ap-header--dark .ap-header__notifications { box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+.ap-header__notifications-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px; }
+.ap-header__notifications-head strong { color: var(--ap-text); }
+.ap-header__notifications-head button { border: 0; background: transparent; color: var(--ap-green); font-family: var(--font-ui-medium); cursor: pointer; font-size: 11px; }
+.ap-header__notifications-head button { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.ap-header__notifications-list { display: flex; flex-direction: column; gap: 6px; max-height: 340px; overflow-y: auto; }
+.ap-header__notification-item { width: 100%; border: 0; border-radius: 14px; background: transparent; display: flex; gap: 10px; align-items: flex-start; padding: 10px; text-align: left; cursor: pointer; color: var(--ap-text); }
+.ap-header__notification-item:hover, .ap-header__notification-item--unread { background: var(--ap-surface-2); }
+.ap-header__notification-item > span { width: 32px; height: 32px; border-radius: 11px; display: grid; place-items: center; background: var(--ap-green-dim); color: var(--ap-green); flex-shrink: 0; }
+.ap-header__notification-item strong { display: block; color: var(--ap-text); font-size: 13px; }
+.ap-header__notification-item small { display: block; color: var(--ap-muted); margin-top: 3px; line-height: 1.45; }
+.ap-header__notification-empty { padding: 18px; text-align: center; color: var(--ap-muted); font-size: 13px; }
+
+.ap-header__notifications-more {
+  margin: 8px;
+  min-height: 40px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  color: var(--ap-green);
+  background: rgba(61,160,80,.1);
+  text-decoration: none;
+  font-size: 12.5px;
+  font-family: var(--font-ui-medium);
+}
+.ap-header__notifications-more:hover { background: rgba(61,160,80,.16); }
+
+/* Batch 8B: distinguish the source company in notification preview. */
+.ap-header__notification-item .ap-header__notification-company { color:var(--ap-green); font-size:10px; font-family:var(--font-ui-medium); }
+.ap-header__notification-item:disabled { cursor:progress; opacity:.8; }

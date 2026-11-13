@@ -1,0 +1,79 @@
+/* Shared green-gradient rings: rounded progress ends, consistent track and
+   centre-hole proportions. Inherit text and surface colors from each page. */
+.ap-gradient-ring.ap-gradient-ring {
+  --ring-track: rgba(148, 163, 184, .23);
+  --ring-start: #76d991;
+  --ring-end: #218344;
+  position: relative;
+  isolation: isolate;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    var(--ring-start) 0%,
+    var(--ring-end) var(--ring-progress, 0%),
+    var(--ring-track) var(--ring-progress, 0%) 100%
+  ) !important;
+  box-shadow: none;
+}
+
+.ap-gradient-ring::before,
+.ap-gradient-ring::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  width: var(--ring-stroke);
+  height: var(--ring-stroke);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* The start and finish caps follow the ring's centreline, not its outer edge. */
+.ap-gradient-ring::before {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ring-start);
+  opacity: var(--ring-start-visible, 0);
+}
+
+.ap-gradient-ring::after {
+  top: 50%;
+  left: 50%;
+  transform:
+    translate(-50%, -50%)
+    rotate(var(--ring-angle, 0deg))
+    translateY(calc(var(--ring-stroke) / 2 - var(--ring-size) / 2));
+  background: var(--ring-end);
+  opacity: var(--ring-end-visible, 0);
+}
+
+/* Use the same stroke geometry for every score/progress ring.
+   Keep the outer size unchanged and widen the centre opening for a slimmer ring.
+   The stronger selector also wins over page-specific fixed inner dimensions. */
+.ap-gradient-ring.ap-gradient-ring > :first-child {
+  position: relative;
+  z-index: 2;
+  width: calc(var(--ring-size) - var(--ring-stroke) - var(--ring-stroke)) !important;
+  height: calc(var(--ring-size) - var(--ring-stroke) - var(--ring-stroke)) !important;
+}
+
+.apdash-ring { --ring-size: 150px; --ring-stroke: 15px; }
+.apdash-progress-card--compact .apdash-ring { --ring-size: 126px; --ring-stroke: 13px; }
+.apdash-score-ring { --ring-size: 156px; --ring-stroke: 17px; }
+.apr-score-ring { --ring-size: 176px; --ring-stroke: 20px; }
+.apr-rating-ring { --ring-size: 178px; --ring-stroke: 18px; }
+.apr-rating-ring--compact { --ring-size: 152px; --ring-stroke: 16px; }
+.myapr-current-card__score { --ring-size: 148px; --ring-stroke: 16px; }
+
+/* Shared, slightly slimmer progress bars across dashboard, appraisal
+   breakdowns, review previews and appraisal-cycle weight meters. */
+.apdash-bars .apdash-bar-row__track,
+.apr-view-breakdown .apr-view-breakdown__track,
+.apr-view-score-hero .apr-view-score-hero__bars,
+.apr-review-overview .apr-review-overview__track,
+.cyc-weight-meter .cyc-weight-meter__track {
+  height: 7px;
+}
+
+.theme-dark .ap-gradient-ring,
+.ap-header--dark .ap-gradient-ring { --ring-track: rgba(148, 163, 184, .3); }

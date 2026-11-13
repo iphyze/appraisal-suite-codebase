@@ -1,0 +1,36 @@
+/* French and pseudo-locale text expands without clipping shared shell controls. */
+.ap-nav__item-label, .ap-nav__group-title span, .ap-header__dropdown-item span,
+.ap-header__notifications-head, .ap-header__notifications-more,
+.pn-title, .pn-subtitle, .pn-crumb, .rp-head__title, .cp-form-head__title,
+.login-workspace-modal__copy, .login-workspace-option__name {
+  overflow-wrap: anywhere;
+}
+.ap-nav__item-label, .ap-header__dropdown-item span,
+.ap-header__notifications-more, .pn-crumb { white-space: normal; }
+.rp-submit__inner, .cp-submit__inner, .login-workspace-actions__continue {
+  min-width: 0;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 390px) {
+  .login-workspace-actions { flex-wrap: wrap; }
+  .login-workspace-actions > button { min-width: 0; }
+}
+
+/* Explicitly override legacy single-line rules in the expanded sidebar. */
+.ap-nav:not(.ap-nav--collapsed) .ap-nav__item-label {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  min-width: 0;
+  line-height: 1.4;
+}
+.ap-nav:not(.ap-nav--collapsed) .ap-nav__group-title span { white-space: normal; }
+.pn-breadcrumb { min-width: 0; }
+.rp-security__divider span, .cp-security__divider span {
+  white-space: normal;
+  text-align: center;
+}
+.rp-security__badges, .cp-security__badges { flex-wrap: wrap; }
+.global-search__empty small { overflow-wrap: anywhere; }

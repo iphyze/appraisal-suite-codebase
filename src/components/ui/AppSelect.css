@@ -1,0 +1,280 @@
+:root {
+  --app-green: #3da050;
+  --app-green-dark: #2d8040;
+  --app-green-dim: rgba(61, 160, 80, 0.15);
+}
+
+.app-select {
+  position: relative;
+  width: 100%;
+}
+
+.app-select__label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 10.75px;
+  font-family: var(--font-ui-semi-bold);
+  letter-spacing: 0.65px;
+  color: var(--usr-label, var(--apr-muted, var(--ai-muted, #374151)));
+  text-transform: uppercase;
+}
+
+.app-select__trigger {
+  width: 100%;
+  min-height: 46px;
+  border: 1.5px solid var(--usr-input-bd, var(--apr-input-bd, var(--ai-border, #e5e7eb)));
+  background: var(--usr-input-bg, var(--apr-input-bg, var(--ai-bg, #ffffff)));
+  color: var(--usr-text, var(--apr-text, var(--ai-text, #111827)));
+  border-radius: 12px;
+  padding: 0 12px 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.25s ease;
+  font-family: inherit;
+}
+
+.app-select__trigger:hover,
+.app-select--open .app-select__trigger {
+  border-color: var(--app-green);
+  box-shadow: 0 0 0 3px var(--app-green-dim);
+}
+
+.app-select--error .app-select__trigger {
+  border-color: var(--usr-danger, #dc2626) !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+
+.app-select--disabled .app-select__trigger {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.app-select__value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 12.5px;
+  font-family: var(--font-ui-regular);
+}
+
+.app-select__value--placeholder {
+  color: var(--usr-placeholder, var(--apr-placeholder, #9ca3af));
+  font-family: var(--font-ui-regular);
+}
+
+.app-select__clear {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  color: var(--usr-muted, var(--apr-muted, var(--ai-muted, #6b7280)));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.app-select__clear:hover {
+  background: var(--usr-soft, var(--apr-soft, #f3f4f6));
+  color: var(--app-green);
+}
+
+.app-select__chevron {
+  width: 15px;
+  height: 15px;
+  color: var(--usr-muted, var(--apr-muted, var(--ai-muted, #6b7280)));
+  transition: transform 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.app-select__chevron--open {
+  transform: rotate(180deg);
+  color: var(--app-green);
+}
+
+.app-select__dropdown {
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 0;
+  right: 0;
+  z-index: 750;
+  background: var(--usr-card, var(--apr-card, var(--ai-bg, #ffffff)));
+  border: 1px solid var(--usr-border, var(--apr-border, var(--ai-border, #e5e7eb)));
+  border-radius: 14px;
+  box-shadow: var(--usr-shadow-lg, var(--apr-shadow-lg, 0 18px 50px rgba(15, 23, 42, 0.14)));
+  overflow: hidden;
+}
+
+.app-select__search-row {
+  display: flex;
+  align-items: center;
+  padding: 0 13px;
+  border-bottom: 1px solid var(--usr-border, var(--apr-border, var(--ai-border, #e5e7eb)));
+}
+
+.app-select__search-icon {
+  width: 15px;
+  height: 15px;
+  color: var(--usr-muted, var(--apr-muted, var(--ai-muted, #6b7280)));
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.app-select__search {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  padding: 12px 0;
+  font-size: 13px;
+  color: var(--usr-text, var(--apr-text, var(--ai-text, #111827)));
+  font-family: inherit;
+}
+
+.app-select__search::placeholder {
+  color: var(--usr-placeholder, var(--apr-placeholder, #9ca3af));
+}
+
+.app-select__list {
+  max-height: 230px;
+  overflow-y: auto;
+  padding: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.app-select__option {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--usr-text, var(--apr-text, var(--ai-text, #111827)));
+  padding: 9px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: left;
+  font-family: inherit;
+}
+
+.app-select__option:hover {
+  background: var(--usr-soft, var(--apr-soft, #f3f4f6));
+}
+
+.app-select__option--active {
+  background: rgba(61, 160, 80, 0.1) !important;
+  color: var(--app-green-dark);
+}
+
+.app-select__option-label {
+  display: block;
+  font-size: 12px;
+  font-family: var(--font-ui-regular);
+}
+
+.app-select__option-desc {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--usr-muted, var(--apr-muted, var(--ai-muted, #6b7280)));
+}
+
+.app-select__check {
+  width: 15px;
+  height: 15px;
+  color: var(--app-green);
+  flex-shrink: 0;
+}
+
+.app-select__empty,
+.app-select__error {
+  margin: 0;
+  font-size: 12px;
+}
+
+.app-select__empty {
+  padding: 16px 10px;
+  text-align: center;
+  color: var(--usr-muted, var(--apr-muted, var(--ai-muted, #6b7280)));
+}
+
+.app-select__error {
+  color: var(--usr-danger, #dc2626);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.app-select__option--highlighted {
+  background: var(--sel-hover, rgba(61, 160, 80, 0.08)) !important;
+}
+
+.app-select__option--highlighted .app-select__option-label {
+  color: var(--green, #3da050);
+}
+
+
+/* Shared floating select layer: escapes clipped drawers and modal scroll bodies. */
+.app-select__dropdown--floating {
+  position: fixed;
+  right: auto;
+  bottom: auto;
+  z-index: 100100;
+  max-width: calc(100vw - 20px);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  font-family: var(--font-ui-regular, 'Montserrat-Regular', sans-serif);
+}
+.app-select__dropdown--floating .app-select__list {
+  min-height: 0;
+  max-height: var(--app-select-list-max, 230px);
+  flex: 1 1 auto;
+  overscroll-behavior: contain;
+}
+.app-select__trigger:focus-visible,
+.app-select--open .app-select__trigger {
+  outline: none;
+  border-color: var(--app-green, #3da050);
+  box-shadow: 0 0 0 3px var(--app-green-dim, rgba(61,160,80,.14));
+}
+
+.app-select__dropdown--floating.theme-dark .app-select__option--active {
+  color: #86e5af;
+}
+.app-select__dropdown--floating .app-select__option:focus-visible {
+  outline: 2px solid var(--app-green, #3da050);
+  outline-offset: -2px;
+}
+
+/* The dropdown is portaled to body; dark mode is carried on the popover itself. */
+.app-select__dropdown--floating.theme-dark .app-select__option--highlighted .app-select__option-label {
+  color: #86e5af;
+}
+
+/* Portaled AppSelect: a light inherited --sel-hover must not wash out dark options.
+   Keep the existing light appearance and reserve the green tint for active rows. */
+.app-select__dropdown--floating.theme-dark .app-select__option:hover,
+.app-select__dropdown--floating.theme-dark .app-select__option--highlighted {
+  background: rgba(73, 133, 112, 0.20) !important;
+  color: #eef7f2 !important;
+}
+.app-select__dropdown--floating.theme-dark .app-select__option--active,
+.app-select__dropdown--floating.theme-dark .app-select__option--active:hover,
+.app-select__dropdown--floating.theme-dark .app-select__option--active.app-select__option--highlighted {
+  background: rgba(49, 147, 76, 0.20) !important;
+  color: #85e5aa !important;
+}
+.app-select__dropdown--floating.theme-dark .app-select__option:hover .app-select__option-label,
+.app-select__dropdown--floating.theme-dark .app-select__option--highlighted .app-select__option-label {
+  color: inherit !important;
+}

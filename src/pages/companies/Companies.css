@@ -1,0 +1,18 @@
+/* Companies page only: compact buttons and more breathing room below the form. */
+.mod-page.companies-page .companies-form-card .mod-form {
+  padding-bottom: 32px;
+}
+
+.mod-page.companies-page button {
+  font-size: 12.5px;
+}
+
+@media (max-width: 640px) {
+  .mod-page.companies-page .companies-form-card .mod-form {
+    padding-bottom: 28px;
+  }
+}
+
+/* Batch 5i: keep translated company controls legible on small screens. */
+.mod-page.companies-page .mod-btn, .mod-page.companies-page .mod-table th { white-space: normal; overflow-wrap: anywhere; line-height: 1.5; }
+.mod-page.companies-page .mod-form-grid > label { min-width: 0; }

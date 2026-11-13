@@ -1,0 +1,161 @@
+/* ═══════════════════════════════════════════════════════════════
+   SMARTBOOKS — RESPONSIVE.CSS
+   All breakpoint overrides in one place.
+   Import this AFTER App.css in your entry file.
+═══════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────
+   ≤ 1200px — Large tablet / small laptop
+───────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  /* Table: fewer visible columns via scroll */
+  .table-wrapper { min-width: 520px; }
+
+  /* Form 3-col → 2-col */
+  .invoice-form-flex-box { grid-template-columns: repeat(2, 1fr); }
+  .invoice-form-three    { grid-column: span 1; }
+  .invoice-form-full     { grid-column: span 2; }
+}
+
+/* ─────────────────────────────────────────────
+   ≤ 960px — Tablet (nav becomes overlay)
+───────────────────────────────────────────── */
+@media (max-width: 960px) {
+  .content-container { padding-left: 0 !important; }
+
+  /* View box */
+  .view-content-box { margin: 0 14px 28px; padding: 22px 18px; }
+
+  /* Invoice form */
+  .invoice-form-box         { margin: 0 14px 28px; }
+  .invoice-form-f-container { padding: 22px 18px 0; }
+
+  /* Invoice items: allow horizontal scroll */
+  .invoice-items-table { overflow-x: auto; }
+  .invoice-table-header,
+  .invoice-table-row   { min-width: 720px; }
+
+  /* View header stack */
+  .vc-header-flexbox { flex-direction: column; gap: 16px; }
+  .vc-header-col-two { align-items: flex-start; }
+}
+
+/* ─────────────────────────────────────────────
+   ≤ 768px — Mobile landscape / large phone
+───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Section padding */
+  .invoice-section, .journal-section, .client-section,
+  .staff-section,   .project-section, .bank-section,
+  .rate-section,    .user-section,    .generic-section { padding: 0 12px 28px; }
+
+  /* Table controls stack */
+  .table-controls   { flex-direction: column; align-items: stretch; }
+  .table-search-box { max-width: 100%; }
+  .filters-box      { flex-direction: row; flex-wrap: wrap; }
+
+  /* Pagination */
+  .pagination-container { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+  /* Top action */
+  .top-action-wrapper { justify-content: flex-start; }
+
+  /* Modal full-width */
+  .modal-overlay      { padding: 10px; }
+  .modal-content,
+  .modal-content-scrollable { max-width: 100%; }
+
+  /* Form 2-col → 1-col */
+  .invoice-form-flex-box     { grid-template-columns: 1fr; }
+  .invoice-form-three,
+  .invoice-form-full         { grid-column: span 1; }
+
+  /* Summary row */
+  .invoice-form-summary { flex-direction: column; }
+  .invoice-totals       { min-width: 100%; }
+
+  /* Submit button full width */
+  .invoice-action-btn-wrapper { justify-content: stretch; }
+  .invoice-submit-btn         { width: 100%; }
+
+  /* View invoice table */
+  .vc-table-wrapper { min-width: 480px; }
+  .vc-inv-table .vc-tb-inv-disc { flex: 0 0 90px; }
+  .vc-inv-table .vc-tb-inv-vat  { flex: 0 0 80px; }
+  .vc-inv-table .vc-tb-inv-amt  { flex: 0 0 110px; }
+
+  /* Edit loader */
+  .edit-loader-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Page nav */
+  .pn-root  { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .pn-title { font-size: 17px; }
+}
+
+/* ─────────────────────────────────────────────
+   ≤ 480px — Mobile portrait
+───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  /* Header logo/search */
+  .sb-header__search-wrap  { display: none; }
+
+  /* Reduce padding */
+  .invoice-section, .journal-section, .client-section,
+  .staff-section, .project-section, .bank-section,
+  .rate-section, .user-section, .generic-section  { padding: 0 8px 24px; }
+
+  .invoice-form-box         { margin: 0 8px 24px; }
+  .invoice-form-f-container { padding: 16px 14px 0; }
+
+  .view-content-box { margin: 0 8px 24px; padding: 16px 14px; }
+
+  /* Modal slides up from bottom */
+  .modal-overlay            { align-items: flex-end; padding: 0; }
+  .modal-content,
+  .modal-content-scrollable { border-radius: 16px 16px 0 0; max-height: 92vh; }
+  .modal-content-scrollable { max-height: 88vh; }
+
+  /* Table action buttons: icon only */
+  .btn-edit span,
+  .btn-view span,
+  .btns-delete span { pointer-events: none; }
+
+  /* Pagination: fewer items */
+  .pagination-btn:not(.active):not(:first-child):not(:last-child):not([disabled]) {
+    display: none;
+  }
+  .pagination-btn.active,
+  .pagination-btn:first-child,
+  .pagination-btn:last-child,
+  .pagination-btn[disabled] { display: flex; }
+
+  /* Item table small cells */
+  .cell-small { flex: 0 0 80px; min-width: 80px; }
+
+  /* Edit loader 1-col */
+  .edit-loader-grid { grid-template-columns: 1fr; }
+  .edit-loader-card { padding: 18px 14px; }
+
+  /* Signature box */
+  .vc-signature-box { flex-direction: column; gap: 20px; }
+  .vc-signature-group-right { align-items: flex-start; }
+
+  /* Quick actions */
+  .db-qa__grid { flex-direction: column; }
+  .db-qa__btn  { justify-content: center; }
+}
+
+/* ─────────────────────────────────────────────
+   ≤ 360px — Very small phones
+───────────────────────────────────────────── */
+@media (max-width: 360px) {
+  .invoice-form-box,
+  .view-content-box { margin: 0 6px 20px; }
+  
+  .data-table { font-size: 12px; }
+  .data-table thead th { font-size: 9.5px; padding: 9px 10px; }
+  .data-table tbody td { padding: 10px; }
+
+  .pagination-controls { gap: 3px; }
+  .pagination-btn       { min-width: 28px; height: 28px; font-size: 11.5px; }
+}

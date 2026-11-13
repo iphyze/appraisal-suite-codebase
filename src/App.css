@@ -1,0 +1,879 @@
+/* ═══════════════════════════════════════════════════════════
+   SMARTBOOKS — GLOBAL BASE STYLES
+═══════════════════════════════════════════════════════════ */
+
+
+
+@import './Fonts.css';
+/* @import './styles/tables.css';
+@import './styles/forms.css';
+@import './styles/modals.css';
+@import './styles/skeletons.css';
+@import './styles/view-invoice.css';
+@import './styles/chart-select.css';
+@import './styles/checkbox.css';
+@import './styles/create-modal.css';
+@import './styles/time-picker.css'; */
+
+/* ── Reset ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  list-style: none;
+  text-decoration: none;
+}
+
+
+
+/* ── Root font — local Montserrat with system fallbacks ── */
+:root {
+  font-family: var(--font-ui-family);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-synthesis: none;
+}
+
+
+html {
+  scroll-behavior: smooth;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  width: 100%;
+  min-height: 100%;
+  font-family: var(--font-ui-family);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+/* ── Headings — local Montserrat ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-ui-bold);
+  line-height: 1.25;
+}
+
+/* ── Premium thin scrollbars ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(91, 116, 104, 0.34) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  min-height: 42px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(119, 145, 132, 0.42), rgba(76, 105, 91, 0.28));
+  transition: background 0.18s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(61, 160, 80, 0.62), rgba(45, 128, 64, 0.48));
+}
+
+.theme-dark *,
+body.theme-dark * {
+  scrollbar-color: rgba(134, 157, 177, 0.30) transparent;
+}
+
+.theme-dark *::-webkit-scrollbar-thumb,
+body.theme-dark *::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(134, 157, 177, 0.38), rgba(92, 113, 132, 0.24));
+}
+
+.theme-dark *::-webkit-scrollbar-thumb:hover,
+body.theme-dark *::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(106, 196, 126, 0.55), rgba(61, 160, 80, 0.40));
+}
+
+/* ── Shared stat-card ambient tint ── */
+:is(
+  .mod-stat,
+  .qst-stat-card,
+  .cyc-stat-card,
+  .usr-stat-card,
+  .supv-stat-card,
+  .sup-stat-card,
+  .apr-summary-card
+) {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+:is(
+  .mod-stat,
+  .qst-stat-card,
+  .cyc-stat-card,
+  .usr-stat-card,
+  .supv-stat-card,
+  .sup-stat-card,
+  .apr-summary-card
+)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    ellipse 105% 150% at 110% -14%,
+    rgba(61, 160, 80, 0.08) 0%,
+    rgba(61, 160, 80, 0.035) 38%,
+    rgba(61, 160, 80, 0) 72%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.theme-dark :is(
+  .mod-stat,
+  .qst-stat-card,
+  .cyc-stat-card,
+  .usr-stat-card,
+  .supv-stat-card,
+  .sup-stat-card,
+  .apr-summary-card
+)::after {
+  background: radial-gradient(
+    ellipse 105% 150% at 110% -14%,
+    rgba(93, 196, 113, 0.095) 0%,
+    rgba(61, 160, 80, 0.04) 40%,
+    rgba(61, 160, 80, 0) 72%
+  );
+}
+
+:is(
+  .mod-stat,
+  .qst-stat-card,
+  .cyc-stat-card,
+  .usr-stat-card,
+  .supv-stat-card,
+  .sup-stat-card,
+  .apr-summary-card
+) > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Selection ── */
+::selection {
+  color: #0d1f1b;
+  background: rgba(0,177,150,0.2);
+}
+.theme-dark ::selection {
+  color: #e0f5f0;
+  background: rgba(0,177,150,0.3);
+}
+
+/* ═══════════════════════════════════════════
+   LAYOUT — Main container + content
+═══════════════════════════════════════════ */
+.main-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--page-bg, #f4faf9);
+  transition: background-color 0.3s ease;
+}
+.main-container.theme-dark  { --page-bg: #0e1117; }
+.main-container.theme-light { --page-bg: #f1f8f6; }
+
+.content-container {
+  flex: 1;
+  min-width: 0;
+  padding-top: 60px;
+  transition: padding-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (min-width: 961px) {
+  .content-container { padding-left: var(--app-sidebar-width, 260px); }
+}
+
+:root { --app-sidebar-width: 260px; }
+html.ap-sidebar-collapsed { --app-sidebar-width: 82px; }
+@media (max-width: 960px) {
+  .content-container { padding-left: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ADD THIS BLOCK TO THE BOTTOM OF App.css
+   Global CSS variable bridge for all shared components
+   (tables, forms, modals, view pages all read these)
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Light mode global tokens ── */
+.theme-light,
+.main-container.theme-light,
+.content-container.theme-light {
+  --sb-bg:           #f0f7f5;
+  --sb-surface:      #ffffff;
+  --sb-surface-2:    #f8fcfb;
+  --sb-border:       #deeee9;
+  --sb-border-light: #edf6f3;
+  --sb-text-1:       #0d1f1b;
+  --sb-text-2:       #3d5752;
+  --sb-text-3:       #7aada6;
+  --sb-text-4:       #a8c9c3;
+  --sb-brand:        #00b196;
+  --sb-brand-dim:    rgba(0,177,150,0.08);
+  --sb-brand-mid:    #00956e;
+}
+
+/* ── Dark mode global tokens ── */
+.theme-dark,
+.main-container.theme-dark,
+.content-container.theme-dark {
+  --sb-bg:           #0e1117;
+  --sb-surface:      #161b22;
+  --sb-surface-2:    #1c2128;
+  --sb-border:       #30363d;
+  --sb-border-light: #21262d;
+  --sb-text-1:       #e6edf3;
+  --sb-text-2:       #8b949e;
+  --sb-text-3:       #4d7a72;
+  --sb-text-4:       #2a4f46;
+  --sb-brand:        #00c9aa;
+  --sb-brand-dim:    rgba(0,201,170,0.1);
+  --sb-brand-mid:    #00b196;
+}
+
+:root {
+  --sb-surface:    #ffffff;
+  --sb-border:     #deeee9;
+  --sb-text-2:     #3d5752;
+  --sb-brand:      #00b196;
+  --sb-brand-dim:  rgba(0,177,150,0.08);
+}
+
+/* REPLACE body.theme-dark, .theme-dark block */
+body.theme-dark,
+.theme-dark {
+  --sb-surface:    #161b22;
+  --sb-border:     #30363d;
+  --sb-text-2:     #8b949e;
+  --sb-brand:      #00c9aa;
+  --sb-brand-dim:  rgba(0,201,170,0.1);
+}
+
+
+/* =============================================================================
+   LAMBERT APPRAISAL — route placeholders
+============================================================================= */
+.ap-route-placeholder {
+  --arp-green: #3da050;
+  --arp-bg: #f8f9fa;
+  --arp-surface: #ffffff;
+  --arp-border: #e5e7eb;
+  --arp-text: #111827;
+  --arp-muted: #6b7280;
+  min-height: calc(100vh - 68px);
+  padding: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(61, 160, 80, 0.08), transparent 34%),
+    var(--arp-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.ap-route-placeholder.theme-dark {
+  --arp-bg: #0f172a;
+  --arp-surface: #1e293b;
+  --arp-border: #334155;
+  --arp-text: #f1f5f9;
+  --arp-muted: #94a3b8;
+}
+
+.ap-route-placeholder__card {
+  border: 1px solid var(--arp-border);
+  border-radius: 24px;
+  background: var(--arp-surface);
+  padding: 38px;
+  text-align: center;
+  color: var(--arp-muted);
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.06);
+}
+
+.ap-route-placeholder__card span {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 16px;
+  color: var(--arp-green);
+  background: rgba(61, 160, 80, 0.12);
+  font-size: 22px;
+}
+
+.ap-route-placeholder__card h2 {
+  color: var(--arp-text);
+  margin-bottom: 8px;
+}
+
+.ap-route-placeholder__card p {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* Secure session bootstrap loader */
+.ap-session-loader {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: #f8faf9;
+}
+.ap-session-loader span {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 3px solid rgba(61, 160, 80, 0.18);
+  border-top-color: #3da050;
+  animation: ap-session-spin .75s linear infinite;
+}
+@keyframes ap-session-spin { to { transform: rotate(360deg); } }
+.theme-dark .ap-session-loader { background: #0f172a; }
+
+
+/* Browser autocomplete and autofill -------------------------------------------------- */
+/*
+ * Keep autocomplete enabled without allowing Chromium/WebKit to paint yellow/blue
+ * over the application's light and dark input surfaces. The long transition leaves
+ * each field's own background, border, focus ring and shadow in control.
+ */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active {
+  -webkit-text-fill-color: currentColor !important;
+  caret-color: currentColor;
+  background-color: transparent !important;
+  transition: background-color 600000s 0s, color 600000s 0s;
+}
+
+input:autofill,
+textarea:autofill {
+  color: inherit;
+  background: inherit;
+  filter: none;
+}
+
+
+/* Live boot and route-loading experience ------------------------------------- */
+.ap-boot-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 18px;
+  min-height: 100dvh;
+  padding: 24px;
+  color: #17342d;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(61, 160, 80, 0.12), transparent 34%),
+    #f4faf8;
+}
+
+.theme-dark .ap-boot-loader,
+body.theme-dark .ap-boot-loader {
+  color: #edf7f2;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(61, 160, 80, 0.13), transparent 34%),
+    #0e1729;
+}
+
+.ap-boot-loader__mark {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 18px 44px rgba(40, 143, 68, 0.2);
+  animation: ap-boot-float 1.8s ease-in-out infinite;
+}
+
+.ap-boot-loader__mark img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.ap-boot-loader__copy {
+  display: grid;
+  gap: 4px;
+  text-align: center;
+}
+
+.ap-boot-loader__copy strong {
+  font-size: 22px;
+  line-height: 1.15;
+  font-family: var(--font-ui-bold);
+}
+
+.ap-boot-loader__copy span {
+  color: #6c877f;
+  font-size: 13px;
+}
+
+.theme-dark .ap-boot-loader__copy span,
+body.theme-dark .ap-boot-loader__copy span {
+  color: #91a8bf;
+}
+
+.ap-boot-loader__bar {
+  width: min(230px, 66vw);
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(61, 160, 80, 0.13);
+}
+
+.ap-boot-loader__bar span {
+  display: block;
+  width: 42%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2f9b49, #58d273);
+  animation: ap-boot-progress 1.25s ease-in-out infinite;
+}
+
+.ap-boot-error {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  color: #17342d;
+  background: #f4faf8;
+}
+
+.theme-dark .ap-boot-error,
+body.theme-dark .ap-boot-error {
+  color: #edf7f2;
+  background: #0e1729;
+}
+
+.ap-boot-error__card {
+  width: min(520px, 100%);
+  padding: clamp(28px, 5vw, 46px);
+  border: 1px solid rgba(61, 160, 80, 0.18);
+  border-radius: 28px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 24px 70px rgba(24, 58, 49, 0.12);
+}
+
+.theme-dark .ap-boot-error__card,
+body.theme-dark .ap-boot-error__card {
+  background: #172338;
+  border-color: rgba(129, 161, 192, 0.2);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.ap-boot-error__icon {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 18px;
+  border-radius: 18px;
+  color: #d94e4e;
+  background: rgba(217, 78, 78, 0.12);
+  font-size: 22px;
+}
+
+.ap-boot-error__eyebrow {
+  margin-bottom: 7px;
+  color: #2f9b49;
+  font-size: 11px;
+  font-family: var(--font-ui-bold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ap-boot-error h1 {
+  margin-bottom: 12px;
+  font-size: clamp(25px, 5vw, 35px);
+}
+
+.ap-boot-error__card > p:not(.ap-boot-error__eyebrow) {
+  color: #6c877f;
+  line-height: 1.75;
+}
+
+.theme-dark .ap-boot-error__card > p:not(.ap-boot-error__eyebrow),
+body.theme-dark .ap-boot-error__card > p:not(.ap-boot-error__eyebrow) {
+  color: #91a8bf;
+}
+
+.ap-boot-error button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 24px;
+  padding: 13px 19px;
+  border: 0;
+  border-radius: 13px;
+  color: #fff;
+  background: linear-gradient(135deg, #3da050, #278d43);
+  box-shadow: 0 12px 28px rgba(40, 143, 68, 0.24);
+  font: inherit;
+  font-family: var(--font-ui-bold);
+  cursor: pointer;
+}
+
+@keyframes ap-boot-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes ap-boot-progress {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(340%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ap-boot-loader__mark,
+  .ap-boot-loader__bar span {
+    animation: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SHARED TABLE / LIST CONTROL POLISH
+   Keep table avatars, searches and pagination visually aligned
+   across all active modules.
+═══════════════════════════════════════════════════════════ */
+
+/* Initials inside table/list avatars should stay intentionally light. */
+html body :is(
+  .apr-person-cell > span,
+  .usr-avatar,
+  .supv-avatar,
+  .sup-avatar,
+  .dept-name-cell > span,
+  .mail-recipient__avatar
+) {
+  font-family: var(--font-ui-light);
+}
+
+/* Keep the search affordance visible and consistent before placeholders. */
+html body :is(
+  .apr-search,
+  .usr-search,
+  .cyc-search,
+  .qst-search,
+  .sup-search,
+  .supv-search,
+  .dept-search,
+  .mod-search
+) > svg:first-child {
+  width: 15px;
+  height: 15px;
+  min-width: 15px;
+  padding: 0;
+  margin-left: 14px;
+  margin-right: 2px;
+  flex-shrink: 0;
+}
+
+html body :is(
+  .apr-search,
+  .usr-search,
+  .cyc-search,
+  .qst-search,
+  .sup-search,
+  .supv-search,
+  .dept-search,
+  .mod-search,
+  .mail-recipient-search__field
+) input::placeholder {
+  font-family: var(--font-ui-light);
+  font-size: 12.25px;
+  opacity: 1;
+}
+
+/* Pagination controls are deliberately quieter than the page summary text. */
+html body :is(
+  .apr-page-btn,
+  .usr-page-btn,
+  .cyc-page-btn,
+  .qst-page-btn,
+  .sup-page-btn,
+  .supv-pagination button,
+  .mod-pagination button,
+  .dept-pagination button,
+  .pagination-btn
+) {
+  font-family: var(--font-ui-regular);
+  font-size: 11.25px;
+}
+
+html body :is(
+  .apr-page-ellipsis,
+  .usr-page-ellipsis,
+  .cyc-page-ellipsis,
+  .qst-page-ellipsis,
+  .sup-page-ellipsis,
+  .supv-page-ellipsis,
+  .pagination-ellipsis
+) {
+  font-family: var(--font-ui-light);
+  font-size: 10.75px;
+}
+
+html body :is(
+  .apr-page-btn--active,
+  .usr-page-btn--active,
+  .cyc-page-btn--active,
+  .qst-page-btn--active,
+  .sup-page-btn--active,
+  .supv-page-active,
+  .mod-pagination button.active,
+  .dept-pagination button.active,
+  .pagination-btn.active
+) {
+  font-family: var(--font-ui-semi-bold);
+}
+
+
+/* Route transition feedback ------------------------------------------------- */
+.route-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9800;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  background: rgba(244, 247, 246, 0.46);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  transition: opacity 0.16s ease, visibility 0s linear 0.16s;
+}
+
+.theme-dark .route-loader,
+body.theme-dark .route-loader {
+  background: rgba(8, 15, 27, 0.48);
+}
+
+.route-loader--visible {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.16s ease;
+}
+
+.route-loader__panel {
+  min-width: 190px;
+  padding: 18px 22px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.14);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transform: translateY(4px) scale(.985);
+  transition: transform .18s ease;
+}
+
+.theme-dark .route-loader__panel,
+body.theme-dark .route-loader__panel {
+  background: rgba(24, 35, 52, 0.94);
+  border-color: rgba(148, 163, 184, 0.18);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+}
+
+.route-loader--visible .route-loader__panel { transform: translateY(0) scale(1); }
+
+.route-loader__mark-wrap {
+  width: 46px;
+  height: 46px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.route-loader__mark {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
+}
+
+.route-loader__orbit {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(61, 160, 80, 0.14);
+  border-top-color: #3da050;
+  animation: route-loader-spin .8s linear infinite;
+}
+
+.route-loader__copy { display: grid; gap: 3px; }
+.route-loader__copy strong { color: #13233a; font-family: var(--font-ui-semi-bold); font-size: 12.5px; }
+.route-loader__copy span { color: #718096; font-family: var(--font-ui-regular); font-size: 10.5px; }
+.theme-dark .route-loader__copy strong, body.theme-dark .route-loader__copy strong { color: #f1f5f9; }
+.theme-dark .route-loader__copy span, body.theme-dark .route-loader__copy span { color: #94a3b8; }
+
+@keyframes route-loader-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .route-loader,
+  .route-loader__panel,
+  .route-loader__orbit { transition: none; animation: none; }
+}
+
+
+/* App-wide numeric inputs: keep number semantics without browser spinner controls. */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+
+/* ── Shared table action typography ──
+   Table row/bulk actions should read as utility controls rather than heavy CTAs. */
+:is(
+  .apr-actions,
+  .apr-bulk-level-bar,
+  .usr-row-actions,
+  .usr-table-actions,
+  .cyc-row-actions,
+  .cyc-section-actions,
+  .cyc-table-actions,
+  .qst-actions,
+  .sup-row-actions,
+  .sup-table-actions,
+  .supv-row-actions,
+  .supv-table-actions,
+  .dept-row-actions,
+  .mod-row-actions,
+  .action-buttons
+) :is(button, a) {
+  font-family: var(--font-ui-regular) !important;
+  font-size: 11px !important;
+}
+
+
+/* Friendly validation focus — scroll targets briefly pulse after submit */
+.form-error-focus {
+  animation: app-form-error-focus 1.7s ease both;
+}
+@keyframes app-form-error-focus {
+  0%, 100% { box-shadow: inherit; }
+  18%, 72% {
+    border-color: rgba(220, 38, 38, .62) !important;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, .11), 0 10px 26px rgba(239, 68, 68, .06) !important;
+    background-color: rgba(254, 242, 242, .72);
+  }
+}
+body.theme-dark .form-error-focus {
+  animation-name: app-form-error-focus-dark;
+}
+@keyframes app-form-error-focus-dark {
+  0%, 100% { box-shadow: inherit; }
+  18%, 72% {
+    border-color: rgba(248, 113, 113, .65) !important;
+    box-shadow: 0 0 0 4px rgba(248, 113, 113, .12), 0 10px 26px rgba(127, 29, 29, .12) !important;
+    background-color: rgba(127, 29, 29, .12);
+  }
+}
+
+
+/* ── App-wide typography refinement ──────────────────────────────
+   Use the existing, real Montserrat font variants (no synthetic bold).
+   Headings and emphasized figures retain the SemiBold hierarchy through
+   --font-ui-bold; actions and data rows use lighter, readable variants.
+   This is theme-neutral and does not alter sizes, spacing, or colours. */
+
+/* Native buttons, form actions, and links styled as buttons (including
+   Dashboard's "View History" / "Open My Appraisals" link actions). */
+:is(
+  button,
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  a[role="button"],
+  a[class*="btn"],
+  a[class*="button"],
+  [role="button"]
+) {
+  font-family: var(--font-ui-regular) !important;
+  font-weight: normal !important;
+}
+
+/* Prevent <strong> or <b> within an action from making button text heavy.
+   Do not target icons or SVG so icon fonts remain unchanged. */
+:is(button, a[role="button"], a[class*="btn"], a[class*="button"], [role="button"])
+  :is(strong, b) {
+  font-family: var(--font-ui-regular) !important;
+  font-weight: normal !important;
+}
+
+/* First-column table labels, section names and objective titles.
+   Keep numerical score values and major score headings unaffected. */
+:where(table, [role="table"]) tbody td:first-child {
+  font-family: var(--font-ui-medium) !important;
+  font-weight: normal !important;
+}
+:where(table, [role="table"]) tbody td:first-child :is(strong, b, small) {
+  font-family: var(--font-ui-medium) !important;
+  font-weight: normal !important;
+}
+
+/* The dashboard's objective codes have their own type declaration; align
+   them with the lighter first-column objective text. */
+.apdash-table .apdash-objective-code,
+.apdash-table .apdash-objective-text {
+  font-family: var(--font-ui-medium) !important;
+  font-weight: normal !important;
+}
+
+/* Top progress bar: instant feedback on every page change ------------------- */
+.route-progress{position:fixed;top:0;left:0;right:0;z-index:9850;height:3px;pointer-events:none;opacity:0;transition:opacity .2s ease .06s}
+.route-progress--active{opacity:1}
+.route-progress--done{opacity:0;transition:opacity .22s ease .08s}
+.route-progress__bar{display:block;height:100%;width:0;border-radius:0 3px 3px 0;
+  background:linear-gradient(90deg,#34b36a,#2f8a47);box-shadow:0 0 8px rgba(52,179,106,.55)}
+.route-progress--active .route-progress__bar{animation:route-progress-grow 8s cubic-bezier(.08,.82,.17,1) forwards}
+.route-progress--done .route-progress__bar{width:100%;animation:none;transition:width .18s ease}
+@keyframes route-progress-grow{0%{width:0}12%{width:38%}40%{width:68%}100%{width:92%}}
+@media (prefers-reduced-motion: reduce){
+  .route-progress--active .route-progress__bar{animation:none;width:70%}
+}
