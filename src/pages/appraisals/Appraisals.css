@@ -4563,3 +4563,14 @@
 
 .apr-objective-adjust-wrapper { display: inline-flex; max-width: 100%; border-radius: 9px; }
 .apr-objective-adjust-wrapper:focus-visible { outline: 3px solid var(--app-green); outline-offset: 3px; }
+
+/* Inactive library selections on existing staff plans: guide explicit cleanup. */
+.apr-objective-unavailable-notice { display: flex; align-items: flex-start; gap: 10px; margin: 12px 0 16px; padding: 12px 14px; border: 1px solid var(--apr-border); border-radius: 12px; background: var(--apr-soft); color: var(--apr-text); line-height: 1.55; }
+.apr-objective-unavailable-notice > svg { color: var(--apr-danger); flex: 0 0 auto; margin-top: 3px; }
+.apr-objective-unavailable-notice p { margin: 0; font-size: 12px; }
+.apr-objective-unavailable-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 9px 0 12px; color: var(--apr-text); font-size: 12px; line-height: 1.5; }
+.apr-objective-unavailable-row > svg { flex: 0 0 auto; color: var(--apr-danger); }
+.apr-objective-replace-btn { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; white-space: normal; border: 1px solid var(--apr-border); border-radius: 9px; background: var(--apr-card); color: var(--apr-text); }
+.apr-objective-replace-btn:focus-visible { outline: 3px solid var(--app-green); outline-offset: 3px; }
+@media (max-width: 540px) { .apr-objective-unavailable-row .apr-objective-replace-btn { width: 100%; justify-content: center; } }
+@media (prefers-reduced-motion: reduce) { .apr-objective-replace-btn { transition: none !important; } }

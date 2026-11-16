@@ -100,6 +100,13 @@
     "unlockReasonLabel": "Reason for unlocking",
     "unlockReasonHint": "Enter 5 to 500 characters.",
     "cancel": "Cancel",
-    "confirmUnlock": "Unlock objectives"
+    "confirmUnlock": "Unlock objectives",
+    "unavailableNotice_one": "{{count}} selected objective is no longer active or available for this employee. Replace it with an active copy or remove it before locking. Existing targets, evidence and weights are preserved when you replace it.",
+    "unavailableNotice_other": "{{count}} selected objectives are no longer active or available for this employee. Replace them with active copies or remove them before locking. Existing targets, evidence and weights are preserved when you replace them.",
+    "unavailableRow": "This library question is unavailable. It cannot be used to lock this plan.",
+    "replaceActive": "Use active copy",
+    "replaceActiveAria": "Replace unavailable {{code}} with the matching active library question",
+    "unavailableLock_one": "Replace or remove the unavailable objective before locking this plan.",
+    "unavailableLock_other": "Replace or remove the {{count}} unavailable objectives before locking this plan."
   }
 }

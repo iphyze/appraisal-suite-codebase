@@ -28,6 +28,7 @@ import useObjectivePlansStore from '../../stores/useObjectivePlansStore';
 import useToastStore from '../../stores/useToastStore';
 import AppraisalHelpTip from './AppraisalHelpTip';
 import { distributeObjectiveWeights } from './objectiveWeightUtils';
+import { unavailableSelectedObjectives, matchingActiveObjective, replaceUnavailableObjective } from '../../utils/objectiveLibraryAvailability';
 import { generateAiKpiSuggestions, getAiKpiSuggestionsStatus } from '../../services/aiAssistant';
 
 const aiErrorText = (error, t) => error?.response?.data?.message || error?.message || t('setup.suggestionsError');
@@ -50,6 +51,7 @@ const normalizeSelected = (rows = []) => rows.map((row) => ({
   scope: row.scope || 'department',
   review_status: row.review_status || 'ready',
   review_note: row.review_note || '',
+  is_active: Number(row.is_active ?? 1),
   is_new: false,
 }));
 
@@ -64,6 +66,7 @@ const normalizeDefaults = (rows = []) => rows.map((row) => ({
   scope: row.scope || 'department',
   review_status: row.review_status || 'ready',
   review_note: row.review_note || '',
+  is_active: Number(row.is_active ?? 1),
   is_new: false,
   is_default_seed: true,
 }));
@@ -192,6 +195,16 @@ const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, onUp
 
   const usingDepartmentDefaults = !data?.plan && (data?.selected || []).length === 0 && (data?.defaults || []).length > 0;
   const selectedIds = useMemo(() => new Set(rows.map((row) => Number(row.question_id)).filter(Boolean)), [rows]);
+  const unavailableRows = useMemo(() => unavailableSelectedObjectives(rows, data?.available || []), [rows, data?.available]);
+  const unavailableLocalIds = useMemo(() => new Set(unavailableRows.map((row) => row.local_id)), [unavailableRows]);
+  const activeReplacements = useMemo(() => {
+    const matches = {};
+    unavailableRows.forEach((row) => {
+      const candidate = matchingActiveObjective(row, rows, data?.available || []);
+      if (candidate) matches[row.local_id] = candidate;
+    });
+    return matches;
+  }, [unavailableRows, rows, data?.available]);
   const availableOptions = useMemo(() => (data?.available || [])
     .filter((item) => !selectedIds.has(Number(item.id)))
     .map((item) => ({
@@ -276,6 +289,16 @@ const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, onUp
     setRows((current) => current.map((row) => row.local_id === localId ? { ...row, [field]: value } : row));
   };
 
+  const replaceWithActiveCopy = (localId) => {
+    setRows((current) => {
+      const oldRow = current.find((row) => row.local_id === localId);
+      if (!oldRow) return current;
+      const active = matchingActiveObjective(oldRow, current, data?.available || []);
+      if (!active) return current; // Recheck against the latest selection.
+      return current.map((row) => row.local_id === localId ? replaceUnavailableObjective(row, active) : row);
+    });
+  };
+
   const removeRow = (localId) => {
     if (kpiAi.rowId === localId) {
       suggestionRequestRef.current += 1;
@@ -296,6 +319,7 @@ const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, onUp
 
   const validateForLock = () => {
     const errors = [];
+    if (unavailableRows.length) errors.push(t('setup.unavailableLock', { count: unavailableRows.length }));
     if (Number(data?.require_explicit_profile) === 1 && !scoringProfileId) errors.push(t('setup.requireProfile'));
     const min = Number(config.min_objectives || 0);
     const max = config.max_objectives === null || config.max_objectives === undefined || config.max_objectives === '' ? null : Number(config.max_objectives);
@@ -497,6 +521,12 @@ const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, onUp
               </section>
             )}
 
+            {unavailableRows.length > 0 && (
+              <div className="apr-objective-unavailable-notice" role="status">
+                <AppIcon icon={AlertCircle} />
+                <p>{t('setup.unavailableNotice', { count: unavailableRows.length })}</p>
+              </div>
+            )}
             <section className="apr-objective-plan-items" aria-label={t('setup.selectedAria')}>
               <div className="apr-objective-section-heading apr-objective-section-heading--small">
                 <div><span className="apr-objective-kicker">{t('setup.detailsKicker')}</span><h4>{t('setup.selectedTitle')} <span className="apr-objective-count">{rows.length}</span></h4><p>{t('setup.detailsDetail')}</p></div>
@@ -523,6 +553,19 @@ const ObjectiveSetupModal = ({ staff, sectionId, cycle, onClose, onChanged, onUp
                       </div>
                     </div>
 
+                    {unavailableLocalIds.has(row.local_id) && (
+                      <div className="apr-objective-unavailable-row" role="status">
+                        <AppIcon icon={AlertCircle} />
+                        <span>{t('setup.unavailableRow')}</span>
+                        {!locked && canEditPlan && activeReplacements[row.local_id] && (
+                          <button type="button" className="apr-mini-btn apr-objective-replace-btn"
+                            onClick={() => replaceWithActiveCopy(row.local_id)}
+                            aria-label={t('setup.replaceActiveAria', { code: row.objective_code || row.question_text })}>
+                            <AppIcon icon={CheckCircle2} /> {t('setup.replaceActive')}
+                          </button>
+                        )}
+                      </div>
+                    )}
                     <div className="apr-objective-fields">
                       <label className="apr-objective-field apr-objective-field--target">
                         <span>{t('setup.targetLabel')} {Number(config.require_target) === 1 ? '*' : ''}</span>

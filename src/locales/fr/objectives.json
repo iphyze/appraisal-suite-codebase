@@ -100,6 +100,13 @@
     "unlockReasonLabel": "Motif du déverrouillage",
     "unlockReasonHint": "Saisissez entre 5 et 500 caractères.",
     "cancel": "Annuler",
-    "confirmUnlock": "Déverrouiller les objectifs"
+    "confirmUnlock": "Déverrouiller les objectifs",
+    "unavailableNotice_one": "{{count}} objectif sélectionné n’est plus actif ou accessible pour ce salarié. Remplacez-le par une copie active ou retirez-le avant le verrouillage. La cible, la preuve et la pondération sont conservées lors du remplacement.",
+    "unavailableNotice_other": "{{count}} objectifs sélectionnés ne sont plus actifs ou accessibles pour ce salarié. Remplacez-les par des copies actives ou retirez-les avant le verrouillage. Les cibles, les preuves et les pondérations sont conservées lors du remplacement.",
+    "unavailableRow": "Cet objectif de la bibliothèque n’est plus disponible. Il ne peut pas être utilisé pour verrouiller le plan.",
+    "replaceActive": "Utiliser la copie active",
+    "replaceActiveAria": "Remplacer l’objectif indisponible {{code}} par l’objectif actif correspondant",
+    "unavailableLock_one": "Remplacez ou retirez l’objectif indisponible avant de verrouiller ce plan.",
+    "unavailableLock_other": "Remplacez ou retirez les {{count}} objectifs indisponibles avant de verrouiller ce plan."
   }
 }
