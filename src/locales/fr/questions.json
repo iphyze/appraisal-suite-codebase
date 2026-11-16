@@ -311,5 +311,11 @@
   "form_order_for_question": "Ordre de tri de la question {{number}}",
   "form_anchor_value_label": "Valeur du {{anchor}}",
   "form_anchor_description_label": "Description du {{anchor}}",
-  "form_section_option_description": "{{weight}} % • {{year}}"
+  "form_section_option_description": "{{weight}} % • {{year}}",
+  "form_kpi_safe_remove_explanation": "Les questions KPI non utilisées seront supprimées lors de l’enregistrement. Celles déjà affectées au personnel ou utilisées dans une évaluation seront plutôt désactivées afin de préserver les plans existants et l’historique.",
+  "form_kpi_pending_removals_one": "{{formattedCount}} question KPI sélectionnée pour retrait. Les questions référencées seront désactivées plutôt que supprimées.",
+  "form_kpi_pending_removals_other": "{{formattedCount}} questions KPI sélectionnées pour retrait. Les questions référencées seront désactivées plutôt que supprimées.",
+  "form_kpi_deactivated_notice_one": "{{count}} question KPI référencée a été désactivée au lieu d’être supprimée afin de préserver les affectations et l’historique des évaluations.",
+  "form_kpi_deactivated_notice_other": "{{count}} questions KPI référencées ont été désactivées au lieu d’être supprimées afin de préserver les affectations et l’historique des évaluations.",
+  "form_kpi_removed_notice": "{{deleted}} supprimée(s) ; {{deactivated}} désactivée(s) afin de préserver les affectations du personnel et l’historique des évaluations."
 }

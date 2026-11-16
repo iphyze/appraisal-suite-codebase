@@ -311,5 +311,11 @@
   "form_order_for_question": "Sort order for question {{number}}",
   "form_anchor_value_label": "{{anchor}} value",
   "form_anchor_description_label": "{{anchor}} description",
-  "form_section_option_description": "{{weight}}% • {{year}}"
+  "form_section_option_description": "{{weight}}% • {{year}}",
+  "form_kpi_safe_remove_explanation": "Unused KPI questions will be deleted when you save. Questions already assigned to staff or used in an appraisal will instead be deactivated to preserve existing plans and history.",
+  "form_kpi_pending_removals_one": "{{formattedCount}} KPI question selected for removal. Referenced questions will be deactivated instead of deleted.",
+  "form_kpi_pending_removals_other": "{{formattedCount}} KPI questions selected for removal. Referenced questions will be deactivated instead of deleted.",
+  "form_kpi_deactivated_notice_one": "{{count}} referenced KPI question was deactivated rather than deleted to preserve staff assignments and appraisal history.",
+  "form_kpi_deactivated_notice_other": "{{count}} referenced KPI questions were deactivated rather than deleted to preserve staff assignments and appraisal history.",
+  "form_kpi_removed_notice": "{{deleted}} deleted; {{deactivated}} deactivated to preserve existing staff assignments and appraisal history."
 }

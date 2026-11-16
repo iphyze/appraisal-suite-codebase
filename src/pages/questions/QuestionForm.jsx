@@ -266,7 +266,7 @@ const DeleteQuestionRowModal = ({ target, questionType = 'KPI', onCancel, onConf
           </div>
           <div className="qst-modal-body">
             <p>
-              {qf('form_delete_question_explanation')}
+              {qf(questionType === 'KPI' ? 'form_kpi_safe_remove_explanation' : 'form_delete_question_explanation')}
             </p>
             <div className="qst-modal-preview">
               <strong>{target.row?.question_text || qf('form_selected_question', { questionType: qf(questionType === 'KPI' ? 'form_question_type_kpi' : 'form_question_type_general') })}</strong>
@@ -1545,7 +1545,7 @@ const QuestionForm = ({ type = 'kpi', mode = 'create', initialQuestion = null })
               <div>
                 <AppIcon icon="Trash2" />
                 <span>
-                  {qf('form_pending_deletions', { count: removedRows.length, formattedCount: formatNumber(removedRows.length, {}, locale) })}
+                  {qf(isKpi ? 'form_kpi_pending_removals' : 'form_pending_deletions', { count: removedRows.length, formattedCount: formatNumber(removedRows.length, {}, locale) })}
                 </span>
               </div>
               <button type="button" onClick={restoreRemovedRows}>

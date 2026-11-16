@@ -158,7 +158,11 @@ const useKpiQuestionsStore = create((set) => ({
       const response = await api.put('/kpi-questions/bulk-update', payload, {
         headers: authHeader(),
       });
-      useToastStore.getState().showToast(localizedQuestionMessage('form_kpi_questions_saved', response.data?.message || i18n.t('form_kpi_questions_saved', { ns: 'questions' })), 'success');
+      const deactivated = Number(response.data?.deactivated_count || 0);
+      const savedMessage = localizedQuestionMessage('form_kpi_questions_saved', response.data?.message || i18n.t('form_kpi_questions_saved', { ns: 'questions' }));
+      useToastStore.getState().showToast(deactivated > 0
+        ? `${i18n.t('form_kpi_questions_saved', { ns: 'questions' })} ${i18n.t('form_kpi_deactivated_notice', { ns: 'questions', count: deactivated })}`
+        : savedMessage, 'success');
       set({ saving: false });
       return { success: true, data: response.data?.data };
     } catch (error) {
@@ -175,7 +179,11 @@ const useKpiQuestionsStore = create((set) => ({
         headers: authHeader(),
         data: { ids },
       });
-      useToastStore.getState().showToast(response.data?.message || 'KPI question deleted successfully', 'success');
+      const deactivated = Number(response.data?.data?.deactivated_count || 0);
+      const deleted = Number(response.data?.data?.deleted_count || 0);
+      useToastStore.getState().showToast(deactivated > 0
+        ? i18n.t('form_kpi_removed_notice', { ns: 'questions', deleted, deactivated })
+        : (response.data?.message || 'KPI question deleted successfully'), 'success');
       set({ deleting: false });
       return { success: true, data: response.data };
     } catch (error) {
