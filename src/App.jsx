@@ -44,6 +44,7 @@ const lazyWithRetry = (loader, key) => lazy(async () => {
 const loaders = {
   login: () => import('./pages/auth/Login'),
   changePassword: () => import('./pages/auth/ChangePassword'),
+  passwordRecovery: () => import('./pages/auth/PasswordRecovery'),
   dashboard: () => import('./pages/home/Dashboard'),
   aiAssistant: () => import('./pages/ai/AiAssistant'),
   aiSettings: () => import('./pages/ai/AiFeatureSettings'),
@@ -84,6 +85,7 @@ const loaders = {
 
 const Login = lazyWithRetry(loaders.login, 'login');
 const ChangePassword = lazyWithRetry(loaders.changePassword, 'change-password');
+const PasswordRecovery = lazyWithRetry(loaders.passwordRecovery, 'password-recovery');
 const Dashboard = lazyWithRetry(loaders.dashboard, 'dashboard');
 const AiAssistant = lazyWithRetry(loaders.aiAssistant, 'ai-assistant');
 const AiFeatureSettings = lazyWithRetry(loaders.aiSettings, 'ai-settings');
@@ -133,6 +135,7 @@ const loaderForPath = (path = '/') => {
   else if (path === '/users/company-access') loader = loaders.companyGrants;
   else if (path === '/login') loader = loaders.login;
   else if (path === '/change-password') loader = loaders.changePassword;
+  else if (path === '/forgot-password' || path === '/reset-password') loader = loaders.passwordRecovery;
   else if (path === '/users/home') loader = loaders.usersOverview;
   else if (path === '/users/create-user') loader = loaders.createUser;
   else if (/^\/users\/edit\//.test(path)) loader = loaders.editUser;
@@ -284,6 +287,8 @@ const App = () => (
     <Suspense fallback={<AppLoadingScreen label="Loading your workspace" />}>
       <Routes>
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+        <Route path="/forgot-password" element={<PasswordRecovery />} />
+        <Route path="/reset-password" element={<PasswordRecovery />} />
         <Route path="/change-password" element={<Protected><ChangePassword /></Protected>} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertCircle,
@@ -408,6 +408,8 @@ const Login = () => {
                 )}
               </AnimatePresence>
             </div>
+
+            <Link to="/forgot-password" className="login-forgot-password">{t('forgot_password')}</Link>
 
             <motion.button
               type="submit"

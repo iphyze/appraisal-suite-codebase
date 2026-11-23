@@ -760,3 +760,10 @@
   .login__topbar { top: 16px; right: 16px; left: 16px; gap: 8px; }
   .login__right { padding-top: 68px; }
 }
+
+
+/* Self-service account recovery entry point. */
+.login-forgot-password { display: inline-flex; align-self: flex-end; padding: 6px 2px;
+  color: var(--rp-label); font-size: 13px; font-weight: 600; text-decoration: none; }
+.login-forgot-password:hover { color: var(--green); }
+.login-forgot-password:focus-visible { outline: 3px solid var(--rp-input-focus); outline-offset: 3px; border-radius: 4px; }
